@@ -35,12 +35,14 @@ export default function TagSelector({
     <div className="relative space-y-2">
       {/* Tags + Input + Toggle */}
       <div className="focus-within:ring-primary flex flex-wrap items-center gap-2 rounded-lg border px-2 py-1 focus-within:ring-2">
-        {selectedTags.map((tag) => (
-          <TagBadge key={tag} tag={tag} onRemove={() => removeTag(tag)} />
-        ))}
+        <div className="flex max-h-24 flex-wrap gap-1 overflow-auto">
+          {selectedTags.map((tag) => (
+            <TagBadge key={tag} tag={tag} onRemove={() => removeTag(tag)} />
+          ))}
+        </div>
 
         <Input
-          className="min-w-[100px] flex-1 border-none shadow-none focus-visible:ring-0 focus-visible:ring-offset-0"
+          className="min-w-[80px] flex-1 flex-grow border-none shadow-none focus-visible:ring-0 focus-visible:ring-offset-0"
           placeholder="Search or add tag"
           value={inputValue}
           onChange={(e) => setInputValue(e.target.value)}

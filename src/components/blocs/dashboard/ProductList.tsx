@@ -85,6 +85,11 @@ export function ProductList() {
       {products.map((product, index) => (
         <ProductCard key={index} product={product} />
       ))}
+      {products.length === 0 && (
+        <div className="text-muted p-4 text-center">
+          No products found. Adjust your filters.
+        </div>
+      )}
     </section>
   );
 }

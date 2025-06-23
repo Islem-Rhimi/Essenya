@@ -14,7 +14,7 @@ export default function ProductFilterSection({
   const [priceRange, setPriceRange] = useState<[number, number]>([0, 100]);
 
   return (
-    <div className="space-y-4">
+    <div className="hidden space-y-4 lg:block">
       <TagSelector selectedTags={tags} setSelectedTags={setTags} />
       <PriceSlider priceRange={priceRange} setPriceRange={setPriceRange} />
       <Button
