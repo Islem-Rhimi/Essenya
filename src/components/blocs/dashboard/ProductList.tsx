@@ -1,8 +1,4 @@
-import { Card, CardContent } from "@/components/ui/card";
-import Image from "next/image";
-import { HoverEffect } from "~/components/ui/aceternity/hover-effec";
 import ProductCard from "./ProductCard";
-// You need to import this component from Aceternity’s source
 
 export function ProductList() {
   const products = [
@@ -81,12 +77,15 @@ export function ProductList() {
   ];
 
   return (
-    <section className="grid grid-cols-1 gap-6 p-6 sm:grid-cols-2 lg:grid-cols-3">
-      {products.map((product, index) => (
-        <ProductCard key={index} product={product} />
-      ))}
-      {products.length === 0 && (
-        <div className="text-muted p-4 text-center">
+    <section className="backdrop- rounded-2xl bg-slate-100 p-6">
+      {products.length > 0 ? (
+        <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-4">
+          {products.map((product, index) => (
+            <ProductCard key={index} product={product} />
+          ))}
+        </div>
+      ) : (
+        <div className="text-muted-foreground p-4 text-center">
           No products found. Adjust your filters.
         </div>
       )}
