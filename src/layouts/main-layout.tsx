@@ -15,9 +15,9 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
       <Sidebar />
       <MobileSidebar />
 
-      <div className="bg-background ml-0 flex flex-1 flex-col">
+      <div className="ml-0 flex flex-1 flex-col">
         <Navbar />
-        <main className="flex-1 p-6">{children}</main>
+        <main className="flex-1 bg-[#f0fbf8]">{children}</main>
       </div>
     </div>
     // </AuthGuard>

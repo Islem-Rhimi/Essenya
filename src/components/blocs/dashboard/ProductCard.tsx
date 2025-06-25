@@ -1,60 +1,84 @@
-"use client";
-import { cn } from "@/lib/utils";
 import Image from "next/image";
+import { Heart, ShoppingCart } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 
 interface ProductCardProps {
   product: {
     name: string;
     description: string;
     image: string;
-    price: string;
+    price: number;
+    unit: string;
+    tags: string[];
+    location: string;
+    rating: number;
+    reviews: number;
+    inStock: boolean;
   };
 }
 
-const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
+export default function ProductCard({ product }: ProductCardProps) {
+  const {
+    name,
+    description,
+    image,
+    price,
+    unit,
+    tags,
+    location,
+    rating,
+    reviews,
+    inStock,
+  } = product;
+
   return (
-    <div className="group/card w-full max-w-xs">
-      <div
-        className={cn(
-          "relative mx-auto flex h-96 max-w-sm cursor-pointer flex-col justify-between overflow-hidden rounded-md bg-cover bg-center bg-no-repeat p-4 shadow-xl",
+    <div className="relative rounded-xl border bg-white p-3 shadow-sm hover:shadow-md">
+      <div className="relative h-40 w-full overflow-hidden rounded-lg">
+        <Image src={image} alt={name} fill className="object-cover" />
+        {!inStock && (
+          <span className="absolute top-2 right-2 rounded-full bg-red-600 px-2 py-0.5 text-xs text-white">
+            Out of Stock
+          </span>
         )}
-      >
-        {/* Image layer */}
-        <Image
-          src={product.image}
-          alt={product.name}
-          fill
-          className="rounded-xl object-cover"
-        />
+        <a className="absolute right-2 bottom-2 rounded-full bg-white p-1 shadow">
+          <Heart className="text-muted-foreground h-4 w-4" />
+        </a>
+      </div>
 
-        {/* Black hover overlay */}
-        <div className="absolute top-0 left-0 z-10 h-full w-full bg-black opacity-40 transition duration-300 group-hover/card:opacity-60" />
-
-        {/* Header */}
-        <div className="z-20 flex flex-row items-center space-x-4">
-          <img
-            height="100"
-            width="100"
-            alt="Avatar"
-            src="/manu.png"
-            className="h-10 w-10 rounded-full border-2 object-cover"
-          />
-          <div className="flex flex-col">
-            <p className="text-base font-normal text-gray-50">{product.name}</p>
-            <p className="text-sm text-gray-300">{product.price}</p>
-          </div>
+      <div className="space-y-2 pt-2">
+        <div className="flex flex-wrap gap-1">
+          {tags.map((tag) => (
+            <Badge key={tag} variant="outline" className="text-xs">
+              {tag}
+            </Badge>
+          ))}
         </div>
 
-        {/* Content */}
-        <div className="z-20">
-          <h1 className="text-xl font-bold text-white md:text-2xl">
-            {product.name}
-          </h1>
-          <p className="my-4 text-sm text-gray-200">{product.description}</p>
+        <h2 className="text-lg leading-snug font-semibold">{name}</h2>
+        <p className="text-muted-foreground text-sm">{location}</p>
+
+        <div className="flex items-center gap-1 text-sm text-yellow-500">
+          <span className="font-semibold">{rating.toFixed(1)}</span>
+          <span className="text-muted-foreground">({reviews} reviews)</span>
         </div>
+
+        <div className="flex items-center justify-between pt-1">
+          <span className="text-foreground text-lg font-bold">
+            ${price.toFixed(2)}
+          </span>
+          <span className="text-muted-foreground text-sm">per {unit}</span>
+        </div>
+
+        <Button
+          variant="default"
+          size="sm"
+          className="mt-2 w-full"
+          disabled={!inStock}
+        >
+          <ShoppingCart className="mr-2 h-4 w-4" /> Add to Cart
+        </Button>
       </div>
     </div>
   );
-};
-
-export default ProductCard;
+}

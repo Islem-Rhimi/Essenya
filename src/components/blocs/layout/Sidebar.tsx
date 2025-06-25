@@ -10,8 +10,6 @@ import {
   Plane,
   User,
   LogOut,
-  ChevronLeft,
-  ChevronRight,
   AlignLeft,
   X,
 } from "lucide-react";
@@ -32,7 +30,7 @@ export default function Sidebar() {
   return (
     <aside
       className={clsx(
-        "bg-muted hidden flex-col border-r transition-all duration-300 md:flex",
+        "border-foreground hidden flex-col shadow-sm transition-all duration-300 md:flex",
         collapsed ? "w-15" : "w-64",
       )}
     >

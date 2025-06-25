@@ -1,34 +1,29 @@
 // components/layout/Navbar.tsx
 "use client";
 
-import { Bell, LogOut, SearchXIcon } from "lucide-react";
+import { Bell, LogOut, ShoppingCart } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import ThemeToggle from "../landing/ThemeToggle";
 
 export default function Navbar() {
   return (
-    <header className="bg-background border-b-primary sticky top-0 z-40 flex items-center justify-between border-b-3 px-6 py-4">
+    <header className="bg-background sticky top-0 z-40 flex items-center justify-between px-6 py-4 shadow-2xs">
       <h1 className="hidden text-lg font-semibold md:block">Dashboard</h1>
-
       <div className="ml-auto flex items-center gap-4">
-        <div className="relative">
-          <Input
-            type="text"
-            placeholder="Search..."
-            className="w-[200px] border-transparent shadow-amber-50 md:w-[300px]"
-          />
-        </div>
-
         <Button variant="ghost" size="icon" aria-label="Notifications">
           <Bell className="h-5 w-5" />
         </Button>
+        <Button variant="ghost" size="icon" aria-label="Notifications">
+          <ShoppingCart className="h-5 w-5" />
+        </Button>
+        <ThemeToggle />
 
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
