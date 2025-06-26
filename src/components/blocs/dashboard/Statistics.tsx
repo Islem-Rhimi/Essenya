@@ -37,31 +37,29 @@ export default function FarmerDashboard() {
   ];
 
   return (
-    <div className="p-6">
-      <div className="mx-auto grid max-w-7xl grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-4">
-        {metrics.map((metric, index) => (
-          <div key={index} className="bg-card rounded-lg border p-6 shadow-sm">
-            <div className="mb-4 flex items-center justify-between">
-              <div>
-                <p className="text-muted-foreground mb-1 text-sm font-medium">
-                  {metric.title}
-                </p>
-                <p className="text-foreground text-3xl font-bold">
-                  {metric.value}
-                </p>
-              </div>
-              <div className={`rounded-lg p-3 ${metric.iconBg}`}>
-                <metric.icon className={`h-6 w-6 ${metric.iconColor}`} />
-              </div>
+    <div className="mx-auto grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-4">
+      {metrics.map((metric, index) => (
+        <div key={index} className="bg-card rounded-lg border p-6 shadow-sm">
+          <div className="mb-4 flex items-center justify-between">
+            <div>
+              <p className="text-muted-foreground mb-1 text-sm font-medium">
+                {metric.title}
+              </p>
+              <p className="text-foreground text-3xl font-bold">
+                {metric.value}
+              </p>
             </div>
-            <div className="flex items-center">
-              <span className="text-sm font-medium text-green-600 dark:text-green-400">
-                {metric.change}
-              </span>
+            <div className={`rounded-lg p-3 ${metric.iconBg}`}>
+              <metric.icon className={`h-6 w-6 ${metric.iconColor}`} />
             </div>
           </div>
-        ))}
-      </div>
+          <div className="flex items-center">
+            <span className="text-sm font-medium text-green-600 dark:text-green-400">
+              {metric.change}
+            </span>
+          </div>
+        </div>
+      ))}
     </div>
   );
 }

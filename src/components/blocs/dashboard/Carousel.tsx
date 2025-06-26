@@ -51,24 +51,20 @@ export default function Carousel() {
   const slide = slides[current]!; // Safe, controlled state prevents out-of-bounds
 
   return (
-    <div className="p-4">
+    <div className="px-4">
       {/* Header with Arrows */}
-      <div className="flex justify-between p-2">
-        <div className="flex space-x-2">
-          <Calendar className="text-primary" />
-          <h1 className="text-xl font-semibold">Upcoming Events</h1>
-        </div>
+      <div className="flex justify-end p-2">
         <div className="flex gap-1">
           <button
             onClick={prevSlide}
-            className="rounded-md border border-gray-300 bg-white p-2 shadow transition hover:bg-gray-100"
+            className="bg-background rounded-md border border-gray-300 p-2 shadow transition hover:bg-gray-100"
             aria-label="Previous Slide"
           >
             <ChevronLeft className="h-4 w-4 text-gray-700" />
           </button>
           <button
             onClick={nextSlide}
-            className="rounded-md border border-gray-300 bg-white p-2 shadow transition hover:bg-gray-100"
+            className="bg-background rounded-md border border-gray-300 p-2 shadow transition hover:bg-gray-100"
             aria-label="Next Slide"
           >
             <ChevronRight className="h-4 w-4 text-gray-700" />
