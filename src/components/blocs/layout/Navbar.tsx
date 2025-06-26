@@ -11,11 +11,24 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import ThemeToggle from "../landing/ThemeToggle";
+import { usePathname } from "next/navigation";
 
 export default function Navbar() {
+  const pathname = usePathname() ?? "";
+
+  const getTitle = () => {
+    if (pathname.startsWith("/dashboard")) return "Dashboard";
+    if (pathname.startsWith("/Market")) return "market";
+    if (pathname.startsWith("/farm-service")) return "Services";
+    if (pathname.startsWith("/tourism")) return "Tourism";
+    if (pathname.startsWith("/profile")) return "Profile";
+    if (pathname.startsWith("/market")) return "Market";
+
+    return "Dashboard";
+  };
   return (
     <header className="bg-background sticky top-0 z-40 flex items-center justify-between px-6 py-4 shadow-2xs">
-      <h1 className="hidden text-lg font-semibold md:block">Dashboard</h1>
+      <h1 className="hidden text-lg font-semibold md:block">{getTitle()}</h1>
       <div className="ml-auto flex items-center gap-4">
         <Button variant="ghost" size="icon" aria-label="Notifications">
           <Bell className="h-5 w-5" />

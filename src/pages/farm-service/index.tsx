@@ -1,5 +1,4 @@
 import React from "react";
-import Carousel from "~/components/blocs/dashboard/Carousel";
 import { ProductList } from "~/components/blocs/dashboard/ProductList";
 import ProductFilterSection from "~/components/blocs/dashboard/filter/ProductFilterSection";
 import { MainLayout } from "~/layouts";
@@ -10,24 +9,19 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import Statistics from "~/components/blocs/dashboard/Statistics";
 
-const Dashboard = () => {
+const FarmService = () => {
   return (
     <MainLayout>
       <div className="grid grid-cols-1">
         <div className="grid grid-cols-1 lg:grid-cols-10">
-          <div className="p-6 lg:col-span-10">
-            <Statistics />
-            <Carousel />
-            <h1 className="text-xl font-semibold">
-              Fresh Products Marketplace
-            </h1>
-            <div className="flex justify-between py-2">
-              <span className="text-ring">showing count</span>
+          <div className="p-6 lg:col-span-8">
+            <h1 className="mb-4 text-xl font-semibold">Product List</h1>
+            <div>
+              <span>showing count</span>
               <div className="w-[200px]">
                 <Select defaultValue="relevance">
-                  <SelectTrigger className="focus:ring-primary bg-background rounded-md border border-gray-300 px-3 py-2 focus:ring-2 focus:outline-none">
+                  <SelectTrigger className="focus:ring-primary rounded-md border border-gray-300 px-3 py-2 focus:ring-2 focus:outline-none">
                     <SelectValue placeholder="Sort by" />
                   </SelectTrigger>
                   <SelectContent>
@@ -44,13 +38,12 @@ const Dashboard = () => {
                 </Select>
               </div>
             </div>
-
             <ProductList />
           </div>
 
           {/* Filter only visible on large screens */}
-          {/* <div className="bg-background sticky hidden p-4 shadow-sm lg:col-span-2 lg:block">
-            <div className="sticky top-23 h-fit space-y-4 overflow-visible">
+          <div className="bg-background sticky hidden p-6 shadow-sm lg:col-span-2 lg:block">
+            <div className="relative h-fit space-y-4 overflow-visible">
               <h1 className="pb-2 text-xl font-semibold">Product Filter</h1>
               <ProductFilterSection
                 onFilter={(filters) => {
@@ -58,11 +51,11 @@ const Dashboard = () => {
                 }}
               />
             </div>
-          </div> */}
+          </div>
         </div>
       </div>
     </MainLayout>
   );
 };
 
-export default Dashboard;
+export default FarmService;

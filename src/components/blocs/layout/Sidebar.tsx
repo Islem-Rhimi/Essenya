@@ -19,19 +19,19 @@ import clsx from "clsx";
 const navItems = [
   { name: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
   { name: "Market", href: "/market", icon: Store },
-  { name: "Services", href: "/services", icon: Wrench },
+  { name: "Services", href: "/farm-service", icon: Wrench },
   { name: "Tourism", href: "/tourism", icon: Plane },
   { name: "Profile", href: "/profile", icon: User },
 ];
 
 export default function Sidebar() {
-  const [collapsed, setCollapsed] = useState(false);
+  const [collapsed, setCollapsed] = useState(true);
 
   return (
     <aside
       className={clsx(
-        "border-foreground hidden flex-col shadow-sm transition-all duration-300 md:flex",
-        collapsed ? "w-15" : "w-64",
+        "sticky top-0 hidden max-h-screen flex-col border-r-1 border-gray-100 transition-all duration-300 md:flex",
+        collapsed ? "w-15" : "w-40",
       )}
     >
       <div className="flex items-center justify-between p-4">

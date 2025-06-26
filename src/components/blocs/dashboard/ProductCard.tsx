@@ -1,5 +1,5 @@
 import Image from "next/image";
-import { Heart, ShoppingCart } from "lucide-react";
+import { Heart, ShoppingCart, MapPin, Star } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 
@@ -33,51 +33,84 @@ export default function ProductCard({ product }: ProductCardProps) {
   } = product;
 
   return (
-    <div className="relative rounded-xl border bg-white p-3 shadow-sm hover:shadow-md">
-      <div className="relative h-40 w-full overflow-hidden rounded-lg">
-        <Image src={image} alt={name} fill className="object-cover" />
+    <div className="group bg-card relative rounded-lg border shadow-sm transition-shadow duration-200 hover:shadow-md">
+      {/* Image Container */}
+      <div className="relative h-48 w-full overflow-hidden rounded-t-lg">
+        <Image
+          src={image}
+          alt={name}
+          fill
+          className="object-cover transition-transform duration-300 group-hover:scale-105"
+        />
+
+        {/* Heart Icon */}
+        <Button className="absolute top-3 right-3 rounded-full bg-transparent p-2 shadow-sm backdrop-blur-sm transition-colors hover:bg-white">
+          <Heart className="h-4 w-4 text-gray-600 transition-colors hover:fill-red-500 hover:text-red-500" />
+        </Button>
+
+        {/* Out of Stock Badge */}
         {!inStock && (
-          <span className="absolute top-2 right-2 rounded-full bg-red-600 px-2 py-0.5 text-xs text-white">
+          <div className="absolute top-3 left-3 rounded-md bg-red-500 px-2 py-1 text-xs font-medium text-white">
             Out of Stock
-          </span>
+          </div>
         )}
-        <a className="absolute right-2 bottom-2 rounded-full bg-white p-1 shadow">
-          <Heart className="text-muted-foreground h-4 w-4" />
-        </a>
       </div>
 
-      <div className="space-y-2 pt-2">
+      {/* Card Content */}
+      <div className="space-y-3 p-4">
+        {/* Tags */}
         <div className="flex flex-wrap gap-1">
           {tags.map((tag) => (
-            <Badge key={tag} variant="outline" className="text-xs">
+            <Badge
+              key={tag}
+              variant="secondary"
+              className="bg-gray-100 text-xs font-medium text-gray-700 hover:bg-gray-200 dark:bg-gray-800 dark:text-gray-300"
+            >
               {tag}
             </Badge>
           ))}
         </div>
 
-        <h2 className="text-lg leading-snug font-semibold">{name}</h2>
-        <p className="text-muted-foreground text-sm">{location}</p>
+        {/* Product Name */}
+        <h3 className="text-foreground text-lg leading-tight font-semibold">
+          {name}
+        </h3>
 
-        <div className="flex items-center gap-1 text-sm text-yellow-500">
-          <span className="font-semibold">{rating.toFixed(1)}</span>
-          <span className="text-muted-foreground">({reviews} reviews)</span>
+        {/* Location */}
+        <div className="text-muted-foreground flex items-center gap-1 text-sm">
+          <MapPin className="h-3 w-3" />
+          <span>{location}</span>
         </div>
 
-        <div className="flex items-center justify-between pt-1">
-          <span className="text-foreground text-lg font-bold">
-            ${price.toFixed(2)}
+        {/* Rating */}
+        <div className="flex items-center gap-1">
+          <Star className="h-4 w-4 fill-yellow-400 text-yellow-400" />
+          <span className="text-foreground text-sm font-medium">
+            {rating.toFixed(1)}
           </span>
-          <span className="text-muted-foreground text-sm">per {unit}</span>
+          <span className="text-muted-foreground text-sm">
+            ({reviews} reviews)
+          </span>
         </div>
 
-        <Button
-          variant="default"
-          size="sm"
-          className="mt-2 w-full"
-          disabled={!inStock}
-        >
-          <ShoppingCart className="mr-2 h-4 w-4" /> Add to Cart
-        </Button>
+        {/* Price and Add to Cart */}
+        <div className="flex items-center justify-between pt-2">
+          <div className="flex flex-col">
+            <span className="text-xl font-bold text-green-600">
+              ${price.toFixed(2)}
+            </span>
+            <span className="text-muted-foreground text-xs">per {unit}</span>
+          </div>
+
+          <Button
+            size="sm"
+            className="bg-green-600 text-white hover:bg-green-700"
+            disabled={!inStock}
+          >
+            <ShoppingCart className="mr-1 h-4 w-4" />
+            Add to Cart
+          </Button>
+        </div>
       </div>
     </div>
   );
