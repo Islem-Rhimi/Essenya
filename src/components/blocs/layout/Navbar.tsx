@@ -20,6 +20,7 @@ export default function Navbar() {
     if (pathname.startsWith("/dashboard")) return "Dashboard";
     if (pathname.startsWith("/Market")) return "market";
     if (pathname.startsWith("/farm-service")) return "Services";
+    if (pathname.startsWith("/product-management")) return "My Products";
     if (pathname.startsWith("/tourism")) return "Tourism";
     if (pathname.startsWith("/profile")) return "Profile";
     if (pathname.startsWith("/market")) return "Market";

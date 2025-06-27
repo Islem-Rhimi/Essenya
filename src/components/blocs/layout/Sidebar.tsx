@@ -10,7 +10,10 @@ import {
   Plane,
   User,
   LogOut,
+  PackageCheck,
   AlignLeft,
+  Truck,
+  CalendarDays,
   X,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -22,6 +25,21 @@ const navItems = [
   { name: "Services", href: "/farm-service", icon: Wrench },
   { name: "Tourism", href: "/tourism", icon: Plane },
   { name: "Profile", href: "/profile", icon: User },
+  {
+    name: "Product Management",
+    href: "/product-management",
+    icon: PackageCheck,
+  },
+  {
+    name: "Event Management",
+    href: "/product-management",
+    icon: CalendarDays,
+  },
+  {
+    name: "Service Management",
+    href: "/product-management",
+    icon: Truck,
+  },
 ];
 
 export default function Sidebar() {
@@ -31,7 +49,7 @@ export default function Sidebar() {
     <aside
       className={clsx(
         "sticky top-0 hidden max-h-screen flex-col border-r-1 border-gray-100 transition-all duration-300 md:flex",
-        collapsed ? "w-15" : "w-40",
+        collapsed ? "w-15" : "w-56",
       )}
     >
       <div className="flex items-center justify-between p-4">
