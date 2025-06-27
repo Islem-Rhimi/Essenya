@@ -21,6 +21,8 @@ export default function Navbar() {
     if (pathname.startsWith("/Market")) return "market";
     if (pathname.startsWith("/farm-service")) return "Services";
     if (pathname.startsWith("/product-management")) return "My Products";
+    if (pathname.startsWith("/service-management")) return "My Services";
+    if (pathname.startsWith("/event-management")) return "My Events";
     if (pathname.startsWith("/tourism")) return "Tourism";
     if (pathname.startsWith("/profile")) return "Profile";
     if (pathname.startsWith("/market")) return "Market";

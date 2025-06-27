@@ -1,18 +1,18 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Plus } from "lucide-react";
-import { AddProductModal } from "./AddProductModal";
-import type { ProductFormData } from "~/components/blocs/product-management/product-form";
+import { AddEventModal } from "./AddEventModal";
+import type { EventFormData } from "./event-form";
 
-interface ProductHeaderProps {
-  onAddProduct: (data: ProductFormData) => void;
+interface EventHeaderProps {
+  onAddEvent: (data: EventFormData) => void;
 }
 
-export function ProductHeaderWithModal({ onAddProduct }: ProductHeaderProps) {
+export function EventHeaderWithModal({ onAddEvent }: EventHeaderProps) {
   const [isModalOpen, setIsModalOpen] = useState(false);
 
-  const handleAddProduct = (data: ProductFormData) => {
-    onAddProduct(data);
+  const handleAddEvent = (data: EventFormData) => {
+    onAddEvent(data);
     setIsModalOpen(false);
   };
 
@@ -25,14 +25,14 @@ export function ProductHeaderWithModal({ onAddProduct }: ProductHeaderProps) {
           onClick={() => setIsModalOpen(true)}
         >
           <Plus className="h-4 w-4" />
-          New Product
+          New Event
         </Button>
       </div>
 
-      <AddProductModal
+      <AddEventModal
         open={isModalOpen}
         onClose={() => setIsModalOpen(false)}
-        onSubmit={handleAddProduct}
+        onSubmit={handleAddEvent}
       />
     </>
   );

@@ -1,18 +1,18 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Plus } from "lucide-react";
-import { AddProductModal } from "./AddProductModal";
-import type { ProductFormData } from "~/components/blocs/product-management/product-form";
+import { AddserviceModal } from "./AddServiceModal";
+import type { ServiceFormData } from "~/components/blocs/service-management/service-form";
 
-interface ProductHeaderProps {
-  onAddProduct: (data: ProductFormData) => void;
+interface ServiceHeaderProps {
+  onAddservice: (data: ServiceFormData) => void;
 }
 
-export function ProductHeaderWithModal({ onAddProduct }: ProductHeaderProps) {
+export function ServiceHeaderWithModal({ onAddservice }: ServiceHeaderProps) {
   const [isModalOpen, setIsModalOpen] = useState(false);
 
-  const handleAddProduct = (data: ProductFormData) => {
-    onAddProduct(data);
+  const handleAddservice = (data: ServiceFormData) => {
+    onAddservice(data);
     setIsModalOpen(false);
   };
 
@@ -25,14 +25,14 @@ export function ProductHeaderWithModal({ onAddProduct }: ProductHeaderProps) {
           onClick={() => setIsModalOpen(true)}
         >
           <Plus className="h-4 w-4" />
-          New Product
+          New service
         </Button>
       </div>
 
-      <AddProductModal
+      <AddserviceModal
         open={isModalOpen}
         onClose={() => setIsModalOpen(false)}
-        onSubmit={handleAddProduct}
+        onSubmit={handleAddservice}
       />
     </>
   );

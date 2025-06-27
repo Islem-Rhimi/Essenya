@@ -1,11 +1,9 @@
-// components/layout/Sidebar.tsx
 "use client";
 
 import { useState } from "react";
 import Link from "next/link";
 import {
   LayoutDashboard,
-  Store,
   Wrench,
   Plane,
   User,
@@ -21,7 +19,6 @@ import clsx from "clsx";
 
 const navItems = [
   { name: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
-  { name: "Market", href: "/market", icon: Store },
   { name: "Services", href: "/farm-service", icon: Wrench },
   { name: "Tourism", href: "/tourism", icon: Plane },
   { name: "Profile", href: "/profile", icon: User },
@@ -32,12 +29,12 @@ const navItems = [
   },
   {
     name: "Event Management",
-    href: "/product-management",
+    href: "/event-management",
     icon: CalendarDays,
   },
   {
     name: "Service Management",
-    href: "/product-management",
+    href: "/service-management",
     icon: Truck,
   },
 ];
