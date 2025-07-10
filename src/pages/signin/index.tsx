@@ -8,11 +8,11 @@ export default function SignInPage() {
   return (
     <div className="flex min-h-screen items-center justify-center px-4">
       {/* Outer container: flex with no width restriction */}
-      <div className="bg-background flex overflow-hidden rounded-2xl shadow-xl">
+      <div className="flex overflow-hidden rounded-2xl bg-white shadow-xl dark:bg-black">
         {/* Image container: height matches form height */}
         <div className="hidden md:block">
           <img
-            src="https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=800&q=80"
+            src="/images/login/306009e1b96645c98f6e9253a39cc136.webp"
             alt="Farm Landscape"
             className="h-full w-[400px] object-cover"
           />

@@ -2,14 +2,17 @@
 
 import Link from "next/link";
 import { useState } from "react";
-import { Menu, X } from "lucide-react";
+import { Globe, Menu, X } from "lucide-react";
 import { Button } from "~/components/ui/button";
 import ThemeToggle from "./ThemeToggle";
 
 const navLinks = [
   { label: "Home", href: "#" },
-  { label: "Features", href: "#features" },
-  { label: "Pricing", href: "#pricing" },
+  { label: "Featured", href: "/#featured" },
+  { label: "FAQ", href: "/#faq" },
+  { label: "Products", href: "/products" },
+  { label: "Events", href: "/products" },
+  { label: "Services", href: "/services" },
   { label: "Contact", href: "#contact" },
 ];
 
@@ -20,11 +23,8 @@ export default function Navbar() {
     <header className="fixed top-0 z-50 w-full bg-white shadow-sm dark:bg-black">
       <div className="container mx-auto flex items-center justify-between px-4 py-4">
         {/* Logo */}
-        <Link
-          href="/"
-          className="text-secondary text-xl font-bold dark:text-white"
-        >
-          Essenya
+        <Link href="/" className="text-primary text-xl font-bold">
+          <h1 className="text-primary essenya font-extrabold">ÈSSÈNYA</h1>
         </Link>
 
         {/* Center Nav */}
@@ -43,6 +43,9 @@ export default function Navbar() {
         {/* Right Side */}
         <div className="hidden items-center gap-4 md:flex">
           <ThemeToggle />
+          <Button variant="ghost" size="icon">
+            <Globe size={18} />
+          </Button>
           <Link href="/signin">
             <Button variant="outline">Sign In</Button>
           </Link>
@@ -75,6 +78,9 @@ export default function Navbar() {
             </Link>
           ))}
           <div className="mt-4 flex gap-2">
+            <Button variant="ghost" size="icon">
+              <Globe size={18} />
+            </Button>
             <ThemeToggle />
             <Link href="/signin" className="w-full">
               <Button variant="outline" className="w-full">

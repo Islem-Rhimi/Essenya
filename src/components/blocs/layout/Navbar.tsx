@@ -1,7 +1,7 @@
 // components/layout/Navbar.tsx
 "use client";
 
-import { Bell, LogOut, ShoppingCart } from "lucide-react";
+import { Bell, Globe, LogOut, ShoppingCart } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import {
@@ -40,6 +40,9 @@ export default function Navbar() {
           <ShoppingCart className="h-5 w-5" />
         </Button>
         <ThemeToggle />
+        <Button variant="ghost" size="icon">
+          <Globe size={18} />
+        </Button>
 
         <DropdownMenu>
           <DropdownMenuTrigger asChild>

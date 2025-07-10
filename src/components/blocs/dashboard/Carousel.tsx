@@ -7,13 +7,22 @@ import { Button } from "@/components/ui/button";
 
 const slides = [
   {
-    title: "Sustainable Farming Expo 2024",
+    title: " Honey Harvest Festival 2026",
     description:
-      "Join us for the largest sustainable farming expo featuring the latest in eco-friendly farming techniques.",
-    date: "March 15-17, 2024",
-    location: "Denver, Colorado",
+      "Join us for a sweet and immersive experience at our annual Honey Harvest Festival, where you’ll discover the art of sustainable beekeeping and honey collection. Learn how local farmers nurture bees, explore live hive demos, and taste freshly harvested organic honey — straight from the source!",
+    date: "March 15-17, 2026",
+    location: "kasserine",
     attendees: "1200 attendees",
-    image: "/images/poster-1.jpg", // Correct path
+    image: "/images/event.jpg", // Correct path
+  },
+  {
+    title: " Honey Harvest Festival 2026",
+    description:
+      "Join us for a sweet and immersive experience at our annual Honey Harvest Festival, where you’ll discover the art of sustainable beekeeping and honey collection. Learn how local farmers nurture bees, explore live hive demos, and taste freshly harvested organic honey — straight from the source!",
+    date: "March 15-17, 2026",
+    location: "kasserine",
+    attendees: "1200 attendees",
+    image: "/images/event.jpg", // Correct path
   },
   {
     title: "Organic Farmers Meet 2024",
@@ -22,7 +31,7 @@ const slides = [
     date: "July 10-12, 2024",
     location: "Austin, Texas",
     attendees: "950 attendees",
-    image: "/images/poster-2.jpg", // Correct path
+    image: "/images/event.jpg", // Correct path
   },
 ];
 

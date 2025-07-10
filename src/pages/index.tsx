@@ -1,13 +1,13 @@
 "use client";
 
 import Head from "next/head";
-import FAQ from "~/components/blocs/landing/Faq";
-import Features from "~/components/blocs/landing/Features";
-import Footer from "~/components/blocs/landing/Footer";
+import ContactSection from "~/components/blocs/landing/ContactSection";
+import FAQSection from "~/components/blocs/landing/Faq";
 import Hero from "~/components/blocs/landing/Hero";
-import Pricing from "~/components/blocs/landing/Pricing";
-import Testimonials from "~/components/blocs/landing/Testimonials";
+import ProductListSection from "~/components/blocs/landing/ProductListSection";
+import ServicesSection from "~/components/blocs/landing/ServicesSection";
 import Navbar from "~/components/blocs/landing/navbar";
+import Footer from "~/components/blocs/landing/Footer";
 
 export default function Home() {
   return (
@@ -20,11 +20,11 @@ export default function Home() {
       <>
         <Navbar />
         <Hero />
-        <main className="space-y-24 pt-20">
-          <Features />
-          <Pricing />
-          <Testimonials />
-          <FAQ />
+        <main className="pt-20">
+          <ProductListSection />
+          <FAQSection />
+          <ServicesSection />
+          <ContactSection />
           <Footer />
         </main>
       </>

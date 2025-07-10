@@ -35,9 +35,6 @@ const ServiceCard = ({ service }: ServiceCardProps) => (
       <button className="flex-1 rounded-md bg-green-600 px-4 py-2 font-medium text-white transition-colors hover:bg-green-700">
         Contact Provider
       </button>
-      <button className="rounded-md border border-gray-300 px-4 py-2 transition-colors hover:bg-gray-50">
-        Save
-      </button>
     </div>
   </div>
 );

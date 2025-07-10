@@ -20,7 +20,7 @@ export default function FarmerDashboard() {
     },
     {
       title: "Monthly Sales",
-      value: "$487K",
+      value: "487K ,Dinar",
       change: "+23.1%",
       icon: TrendingUp,
       iconBg: "bg-purple-100 dark:bg-purple-900/20",

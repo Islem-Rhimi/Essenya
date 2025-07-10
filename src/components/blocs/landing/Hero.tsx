@@ -1,13 +1,39 @@
-import { Button } from "~/components/ui/button";
+"use client";
 
-export default function Hero() {
+import { Button } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
+import Link from "next/link";
+
+const HeroSection = () => {
   return (
-    <section className="flex h-[calc(100vh-80px)] flex-col items-center justify-center bg-gray-100 px-4 text-center dark:bg-gray-900">
-      <h1 className="mb-4 text-5xl font-bold">Build your product faster</h1>
-      <p className="mb-8 max-w-xl text-lg text-gray-600 dark:text-gray-300">
-        Beautiful UI components with ShadCN and Tailwind.
-      </p>
-      <Button size="lg">Get Started</Button>
+    <section
+      id="home"
+      className="bg-image relative flex h-screen items-end justify-center overflow-hidden bg-cover bg-center text-center"
+    >
+      {/* Overlay glow or tint */}
+      <div className="absolute inset-0 bg-gradient-to-b"></div>
+
+      <div className="text-foreground relative z-10 max-w-3xl justify-end px-4 pb-32">
+        <div className="mt-6 flex flex-wrap justify-center gap-4">
+          <Link href="/market">
+            <Button size="default" className="rounded-sm shadow-xl">
+              Explore Market
+            </Button>
+          </Link>
+          <Link href="/services">
+            <Button
+              size="default"
+              variant="outline"
+              className="border-primary text-primary hover:bg-primary/10 rounded-sm"
+            >
+              Find Services
+            </Button>
+          </Link>
+          <Link href="/tourism"></Link>
+        </div>
+      </div>
     </section>
   );
-}
+};
+
+export default HeroSection;

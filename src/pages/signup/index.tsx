@@ -6,11 +6,11 @@ import Link from "next/link";
 
 export default function SignUpPage() {
   return (
-    <div className="clsmin-h-screen flex items-center justify-center bg-[#e6e8ea] px-4">
-      <div className="bg-background flex overflow-hidden rounded-2xl shadow-xl">
+    <div className="flex min-h-screen items-center justify-center bg-[#e6e8ea] px-4">
+      <div className="flex overflow-hidden rounded-2xl bg-white shadow-xl dark:bg-black">
         <div className="hidden md:block">
           <img
-            src="https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=800&q=80"
+            src="/images/login/FARM-OHIO.jpeg"
             alt="Farm Landscape"
             className="h-full w-[600px] object-cover"
           />

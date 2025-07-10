@@ -13,13 +13,14 @@ import {
   Truck,
   CalendarDays,
   X,
+  HandPlatter,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import clsx from "clsx";
 
 const navItems = [
   { name: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
-  { name: "Services", href: "/farm-service", icon: Wrench },
+  { name: "Services", href: "/farm-service", icon: HandPlatter },
   { name: "Tourism", href: "/tourism", icon: Plane },
   { name: "Profile", href: "/profile", icon: User },
   {
@@ -35,7 +36,7 @@ const navItems = [
   {
     name: "Service Management",
     href: "/service-management",
-    icon: Truck,
+    icon: Wrench,
   },
 ];
 

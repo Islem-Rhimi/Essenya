@@ -1,3 +1,4 @@
+@import url("https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700&family=Quicksand:wght@400;600;700&display=swap");
 @import "tailwindcss";
 @import "tw-animate-css";
 
@@ -11,6 +12,11 @@
 
 html {
   scroll-behavior: smooth;
+  font-family: "Quicksand", sans-serif;
+}
+
+.essenya {
+  font-family: "Nunito", sans-serif;
 }
 
 @theme inline {
@@ -52,9 +58,10 @@ html {
 }
 
 :root {
+  --font-brand: "Nunito", sans-serif;
   --radius: 0.625rem;
   --background: oklch(0.986 0.004 95); /* #F8F9F3 */
-  --foreground: oklch(0.245 0.19 145); /* #2AA28 */
+  --foreground: oklch(16.959% 0.0577 142.511); /* #2AA28 */
   --card: oklch(1 0 0);
   --card-foreground: oklch(0.129 0.042 264.695);
   --popover: oklch(1 0 0);
@@ -118,6 +125,12 @@ html {
   --sidebar-accent-foreground: oklch(0.984 0.003 247.858);
   --sidebar-border: oklch(1 0 0 / 10%);
   --sidebar-ring: oklch(0.551 0.027 264.364);
+}
+
+.bg-image {
+  background-image:
+    linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.6)),
+    url("/images/hero.jpg");
 }
 
 @layer base {
