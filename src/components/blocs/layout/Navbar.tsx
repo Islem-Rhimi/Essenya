@@ -12,8 +12,10 @@ import {
 } from "@/components/ui/dropdown-menu";
 import ThemeToggle from "../landing/ThemeToggle";
 import { usePathname } from "next/navigation";
+import { signOut, useSession } from "next-auth/react";
 
 export default function Navbar() {
+  const { data: session } = useSession();
   const pathname = usePathname() ?? "";
 
   const getTitle = () => {
@@ -49,14 +51,17 @@ export default function Navbar() {
             <Button variant="ghost" size="icon" className="rounded-full">
               <Avatar className="h-8 w-8">
                 <AvatarImage src="/avatar.jpg" alt="User" />
-                <AvatarFallback>MF</AvatarFallback>
+                <AvatarFallback>
+                  {session?.user?.name?.split(" ")[0]?.charAt(0)}
+                  {session?.user?.name?.split(" ")[1]?.charAt(0)}
+                  </AvatarFallback>
               </Avatar>
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">
             <DropdownMenuItem>Profile</DropdownMenuItem>
             <DropdownMenuItem>Settings</DropdownMenuItem>
-            <DropdownMenuItem onClick={() => console.log("Logout clicked")}>
+            <DropdownMenuItem onClick={() => void signOut()}>
               <LogOut className="mr-2 h-4 w-4" /> Logout
             </DropdownMenuItem>
           </DropdownMenuContent>

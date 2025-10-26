@@ -3,8 +3,21 @@ import { Button } from "@/components/ui/button";
 import { signIn } from "next-auth/react";
 import { FcGoogle } from "react-icons/fc";
 import Link from "next/link";
+import { useState } from "react";
 
 export default function SignInPage() {
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    signIn("credentials", {
+      email,
+      password,
+      redirect: true,
+      redirectTo: "/dashboard",
+    });
+  };
   return (
     <div className="flex min-h-screen items-center justify-center px-4">
       {/* Outer container: flex with no width restriction */}
@@ -36,14 +49,26 @@ export default function SignInPage() {
             <div className="border-muted absolute top-3 right-0 left-0 -z-0 border-t"></div>
           </div>
 
-          <form className="space-y-4">
+          <form onSubmit={handleSubmit} className="space-y-4">
             <div>
               <label className="block text-sm font-medium">Email</label>
-              <Input type="email" placeholder="you@example.com" required />
+              <Input
+                type="email"
+                placeholder="you@example.com"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                required
+              />
             </div>
             <div>
               <label className="block text-sm font-medium">Password</label>
-              <Input type="password" placeholder="••••••••" required />
+              <Input
+                type="password"
+                placeholder="••••••••"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required
+              />
             </div>
             <Button type="submit" className="w-full">
               Sign In
