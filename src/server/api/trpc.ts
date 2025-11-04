@@ -1,5 +1,5 @@
 import { initTRPC, TRPCError } from "@trpc/server";
-import { type Session } from "next-auth";
+// import { type Session } from "next-auth";
 import superjson from "superjson";
 import { ZodError } from "zod";
 import { db } from "../db";
@@ -9,28 +9,26 @@ import { getServerAuthSession } from "../auth";
 /**
  * 1. CONTEXT
  */
-interface CreateContextOptions {
-  session: Session | null;
-}
+// interface CreateContextOptions {
+//   session: Session | null;
+// }
 
-const createInnerTRPCContext = (opts: CreateContextOptions) => {
-  return {
-    session: opts.session,
-    db,
-  };
-};
-
-/**
- * This is the actual context you will use in your router.
- * NOTE: For App Router, session is passed in from the route handler
- */
+// const createInnerTRPCContext = (opts: CreateContextOptions) => {
+//   return {
+//     session: opts.session,
+//     db,
+//   };
+// };
 export const createTRPCContext = async (opts: CreateNextContextOptions) => {
   const { req, res } = opts;
   const session = await getServerAuthSession({ req, res });
 
-  return createInnerTRPCContext({
+  return {
     session,
-  });
+    db,
+    req,
+    res,
+  };
 };
 
 /**

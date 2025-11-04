@@ -7,10 +7,6 @@ generator client {
 
 datasource db {
     provider = "postgresql"
-    // NOTE: When using mysql or sqlserver, uncomment the @db.Text annotations in model Account below
-    // Further reading:
-    // https://next-auth.js.org/adapters/prisma#create-the-prisma-schema
-    // https://www.prisma.io/docs/reference/api-reference/prisma-schema-reference#string
     url      = env("DATABASE_URL")
 }
 
@@ -21,12 +17,12 @@ model Account {
     type                     String
     provider                 String
     providerAccountId        String
-    refresh_token            String? // @db.Text
-    access_token             String? // @db.Text
+    refresh_token            String?
+    access_token             String?
     expires_at               Int?
     token_type               String?
     scope                    String?
-    id_token                 String? // @db.Text
+    id_token                 String?
     session_state            String?
     user                     User    @relation(fields: [userId], references: [id], onDelete: Cascade)
     refresh_token_expires_in Int?
@@ -39,6 +35,7 @@ model Session {
     sessionToken String   @unique
     userId       String
     expires      DateTime
+    sessionType  String?
     user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
@@ -46,14 +43,24 @@ model User {
     id            String    @id @default(cuid())
     name          String?
     email         String    @unique
+    role          String    @default("USER")
     emailVerified DateTime?
     image         String?
     password      String?
     dateOfBirth   DateTime?
+    numTel        String?
     accounts      Account[]
     sessions      Session[]
     createdAt     DateTime  @default(now())
     updatedAt     DateTime  @updatedAt
+
+    // Relations from diagram
+    clientProfile     Client?
+    vendeurProfile    Vendeur?
+    contactsSent      Contact[]        @relation("UserContacts")
+    reservations      Reservation[]
+    servicesRequested DemandeService[] @relation("UserDemandeService")
+    commandesPassed   Commande[]
 }
 
 model VerificationToken {
@@ -62,4 +69,142 @@ model VerificationToken {
     expires    DateTime
 
     @@unique([identifier, token])
+}
+
+// Client model (inherits from user/User)
+model Client {
+    id     String @id @default(cuid())
+    userId String @unique
+    user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+}
+
+// Vendeur model (inherits from user/User)
+model Vendeur {
+    id         String      @id @default(cuid())
+    userId     String      @unique
+    adresse    String?
+    images     String?
+    user       User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+    produits   Produits[]
+    evenements Evenement[]
+
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+}
+
+// Contact model
+model Contact {
+    id       String   @id @default(cuid())
+    objectif String
+    message  String
+    date     DateTime @default(now())
+    userId   String
+    user     User     @relation("UserContacts", fields: [userId], references: [id], onDelete: Cascade)
+
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+}
+
+// Services model
+model Services {
+    id              String           @id @default(cuid())
+    nom             String
+    type            String
+    description     String?
+    prix            Float
+    demandeServices DemandeService[]
+
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+}
+
+// Demande Service model
+model DemandeService {
+    id        Int      @id @default(autoincrement())
+    date      DateTime @default(now())
+    statut    String
+    userId    String
+    serviceId String
+    user      User     @relation("UserDemandeService", fields: [userId], references: [id], onDelete: Cascade)
+    service   Services @relation(fields: [serviceId], references: [id], onDelete: Cascade)
+
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+}
+
+// Produits model
+model Produits {
+    id          String     @id @default(cuid())
+    nom         String
+    prix        Float
+    quantite    Int
+    categorie   String?
+    description String?
+    vendeurId   String
+    vendeur     Vendeur    @relation(fields: [vendeurId], references: [id], onDelete: Cascade)
+    commandes   Commande[]
+
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+}
+
+// Commande model
+model Commande {
+    id        String    @id @default(cuid())
+    date      DateTime  @default(now())
+    statut    String
+    userId    String
+    produitId String
+    user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+    produit   Produits  @relation(fields: [produitId], references: [id], onDelete: Cascade)
+    paiement  Paiement?
+
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+}
+
+// Paiement model
+model Paiement {
+    id         String   @id @default(cuid())
+    date       DateTime @default(now())
+    montant    String
+    commandeId String   @unique
+    commande   Commande @relation(fields: [commandeId], references: [id], onDelete: Cascade)
+
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+}
+
+// Evenement model
+model Evenement {
+    id             String        @id @default(cuid())
+    nom            String
+    description    String?
+    date           DateTime
+    lieu           String
+    duree          String?
+    nbPlaces       Int
+    organisateurId String
+    organisateur   Vendeur       @relation(fields: [organisateurId], references: [id], onDelete: Cascade)
+    reservations   Reservation[]
+
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+}
+
+// Reservation model
+model Reservation {
+    id          String    @id @default(cuid())
+    date        DateTime  @default(now())
+    statut      String
+    userId      String
+    evenementId String
+    user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+    evenement   Evenement @relation(fields: [evenementId], references: [id], onDelete: Cascade)
+
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
 }
