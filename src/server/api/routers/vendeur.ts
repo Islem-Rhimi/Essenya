@@ -4,6 +4,7 @@ import { createTRPCRouter, publicProcedure, protectedProcedure } from "../trpc";
 import { TRPCError } from "@trpc/server";
 import type { Prisma } from "@prisma/client";
 import { buildPaginationMeta, paginate } from "../utils/pagination";
+import { venduerInputSchema } from "~/validations/vendeurInputSchema";
 
 const buildSearchWhere = (search?: string): Prisma.VendeurWhereInput => {
   if (!search) return {};
@@ -54,6 +55,30 @@ export const vendeurRouter = createTRPCRouter({
     if (!vendeur) throw new TRPCError({ code: "NOT_FOUND" });
     return vendeur;
   }),
+
+  create: protectedProcedure
+    .input(venduerInputSchema)
+    .mutation(async ({ ctx, input }) => {
+      const existingVendeur = await ctx.db.vendeur.findUnique({
+        where: { userId: ctx.session.user.id },
+      });
+
+      if (existingVendeur) {
+        throw new Error("Vous avez déjà un concessionnaire");
+      }
+
+      const vendeur = await ctx.db.vendeur.create({
+        data: {
+          userId: ctx.session.user.id,
+          nomBoutique: input.nomBoutique,
+          adresse: input.adresse,
+          description: input.description,
+          images: input.images,
+        },
+      });
+
+      return vendeur;
+    }),
 
   update: protectedProcedure
     .input(

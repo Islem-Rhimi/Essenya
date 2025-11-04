@@ -22,7 +22,7 @@ const DemandeService = () => {
       content: (
         <div className="bg-background relative h-full w-full overflow-hidden rounded-2xl p-2 text-xl font-bold shadow-2xl md:text-4xl">
           <p>Product Tab</p>
-          <DivConte nt />
+          <DivContent />
         </div>
       ),
     },

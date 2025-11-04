@@ -83,11 +83,17 @@ model Client {
 
 // Vendeur model (inherits from user/User)
 model Vendeur {
-    id         String      @id @default(cuid())
-    userId     String      @unique
-    adresse    String?
-    images     String?
-    user       User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+    id     String @id @default(cuid())
+    userId String @unique
+    user   User   @relation(fields: [userId], references: [id])
+
+    // NEW FIELDS FROM WIZARD
+    nomBoutique String
+    adresse     String
+    description String?
+    images      String?
+
+    // Existing relations
     produits   Produits[]
     evenements Evenement[]
 
