@@ -60,10 +60,10 @@ export function SessionTypeGuard({ children }: SessionTypeGuardProps) {
     (sessionType === "VENDEUR" && !sessionType)
   ) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-linear-to-br from-gray-900 via-gray-800 to-black">
+      <div className="flex min-h-screen items-center justify-center bg-linear-to-br from-gray-200 via-gray-300 to-white">
         <div className="text-center">
-          <div className="mx-auto mb-4 h-12 w-12 animate-spin rounded-full border-4 border-yellow-500 border-t-transparent"></div>
-          <p className="text-yellow-500">Chargement...</p>
+          <div className="mx-auto mb-4 h-12 w-12 animate-spin rounded-full border-4 border-green-500 border-t-transparent"></div>
+          <p className="text-green-500">Chargement...</p>
         </div>
       </div>
     );

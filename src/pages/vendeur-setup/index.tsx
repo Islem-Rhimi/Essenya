@@ -28,7 +28,7 @@ import { toast } from "sonner";
 export default function VendeurSetupWizard() {
   const [step, setStep] = useState(1);
   const router = useRouter();
-  // const utils = api.useUtils();
+  const utils = api.useUtils();
 
   const {
     register,
@@ -43,8 +43,11 @@ export default function VendeurSetupWizard() {
   const createMutation = api.vendeur.create.useMutation({
     onSuccess: async () => {
       toast.success("Concessionnaire créé avec succès!");
-      // await utils.vendeur.invalidate();
-      router.push("/dashboard");
+      await utils.vendeur.invalidate();
+      void router.push("/dashboard");
+    },
+    onError: (error) => {
+      toast.error(error.message || "Erreur lors de la création");
     },
   });
   const progress = (step / 4) * 100;
@@ -53,7 +56,7 @@ export default function VendeurSetupWizard() {
     createMutation.mutate({
       nomBoutique: data.nomBoutique,
       adresse: data.adresse,
-      description: data.description,
+      description: data.description ?? undefined,
       images: data.images ?? undefined,
     });
   };

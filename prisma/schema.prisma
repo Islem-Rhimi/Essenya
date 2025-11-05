@@ -54,8 +54,6 @@ model User {
     createdAt     DateTime  @default(now())
     updatedAt     DateTime  @updatedAt
 
-    // Relations from diagram
-    clientProfile     Client?
     vendeurProfile    Vendeur?
     contactsSent      Contact[]        @relation("UserContacts")
     reservations      Reservation[]
@@ -69,16 +67,6 @@ model VerificationToken {
     expires    DateTime
 
     @@unique([identifier, token])
-}
-
-// Client model (inherits from user/User)
-model Client {
-    id     String @id @default(cuid())
-    userId String @unique
-    user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-    createdAt DateTime @default(now())
-    updatedAt DateTime @updatedAt
 }
 
 // Vendeur model (inherits from user/User)

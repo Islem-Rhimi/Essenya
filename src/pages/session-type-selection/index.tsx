@@ -40,7 +40,7 @@ export default function SessionTypeSelection() {
             {/* VENDEUR CARD */}
             <Card
               className="group hover:border-primary/50 bg-card/95 supports-[backdrop-filter]:bg-card/80 cursor-pointer border-2 backdrop-blur transition-all duration-300 hover:shadow-2xl"
-              onClick={() => setSessionType.mutate({ sessionType: "CLIENT" })}
+              onClick={() => setSessionType.mutate({ sessionType: "VENDEUR" })}
             >
               <CardHeader className="pb-8 text-center">
                 <div className="bg-primary/10 mx-auto mb-6 flex h-20 w-20 items-center justify-center rounded-full transition-transform group-hover:scale-110">
@@ -65,7 +65,7 @@ export default function SessionTypeSelection() {
             {/* CLIENT CARD */}
             <Card
               className="group hover:border-primary/50 bg-card/95 supports-[backdrop-filter]:bg-card/80 cursor-pointer border-2 backdrop-blur transition-all duration-300 hover:shadow-2xl"
-              onClick={() => setSessionType.mutate({ sessionType: "VENDEUR" })}
+              onClick={() => setSessionType.mutate({ sessionType: "CLIENT" })}
             >
               <CardHeader className="pb-8 text-center">
                 <div className="bg-primary/10 mx-auto mb-6 flex h-20 w-20 items-center justify-center rounded-full transition-transform group-hover:scale-110">

@@ -1,6 +1,5 @@
 import { createCallerFactory, createTRPCRouter } from "~/server/api/trpc";
 import { userRouter } from "./routers/my-user";
-import { clientRouter } from "./routers/client";
 import { vendeurRouter } from "./routers/vendeur";
 import { contactRouter } from "./routers/contact";
 import { servicesRouter } from "./routers/services";
@@ -19,7 +18,6 @@ import { sessionRouter } from "./routers/session";
  */
 export const appRouter = createTRPCRouter({
   myUser: userRouter,
-  client: clientRouter,
   vendeur: vendeurRouter,
   contact: contactRouter,
   services: servicesRouter,
