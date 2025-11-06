@@ -1,5 +1,8 @@
 {
   "compilerOptions": {
+    "noImplicitAny": false,
+    "allowSyntheticDefaultImports": true,
+    "forceConsistentCasingInFileNames": true,
     /* Base Options: */
     "esModuleInterop": true,
     "skipLibCheck": true,

@@ -56,6 +56,7 @@
     "@trpc/next": "^11.0.0",
     "@trpc/react-query": "^11.0.0",
     "@trpc/server": "^11.0.0",
+    "@uploadthing/react": "^7.3.3",
     "bcryptjs": "^3.0.2",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
@@ -63,6 +64,7 @@
     "date-fns": "^4.1.0",
     "embla-carousel-autoplay": "^8.6.0",
     "embla-carousel-react": "^8.6.0",
+    "formidable": "^3.5.4",
     "framer-motion": "^12.19.1",
     "input-otp": "^1.4.2",
     "lucide-react": "^0.517.0",
@@ -80,6 +82,7 @@
     "sonner": "^2.0.5",
     "superjson": "^2.2.1",
     "tailwind-merge": "^3.3.1",
+    "uploadthing": "^7.7.4",
     "vaul": "^1.1.2",
     "zod": "^3.25.42",
     "zustand": "^5.0.5"
@@ -87,6 +90,7 @@
   "devDependencies": {
     "@eslint/eslintrc": "^3.3.1",
     "@tailwindcss/postcss": "^4.0.15",
+    "@types/formidable": "^3.4.6",
     "@types/node": "^20.14.10",
     "@types/react": "^19.0.0",
     "@types/react-dom": "^19.0.0",

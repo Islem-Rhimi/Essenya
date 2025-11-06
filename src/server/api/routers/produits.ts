@@ -1,50 +1,76 @@
-// src/server/trpc/routers/produits.ts
 import { z } from "zod";
-import { createTRPCRouter, publicProcedure, protectedProcedure } from "../trpc";
 import { TRPCError } from "@trpc/server";
+import { createTRPCRouter, protectedProcedure } from "../trpc";
+import { productUpdateSchema } from "~/validations/product/productUpdateSchema";
+import { productInputSchema } from "~/validations/product/productInputSchema";
 import type { Prisma } from "@prisma/client";
-import { paginate, buildPaginationMeta } from "../utils/pagination";
 
-const buildSearchWhere = (search?: string): Prisma.ProduitsWhereInput => {
-  if (!search) return {};
+// const buildSearchWhere = (search?: string) => {
+//   if (!search) return {};
+
+//   return {
+//     OR: [
+//       { nom: { contains: search, mode: "insensitive" as const } },
+//       { description: { contains: search, mode: "insensitive" as const } },
+//       { categorie: { contains: search, mode: "insensitive" as const } },
+//       ...(isNaN(Number(search)) ? [] : [{ year: Number(search) }]),
+//     ],
+//   };
+// };
+
+// Helper function to build pagination meta
+const buildPaginationMeta = (total: number, page: number, pageSize: number) => {
+  const lastPage = Math.ceil(total / pageSize);
+  const from = total > 0 ? (page - 1) * pageSize + 1 : 0;
+  const to = Math.min(page * pageSize, total);
+
   return {
-    OR: [
-      { nom: { contains: search, mode: "insensitive" } },
-      { description: { contains: search, mode: "insensitive" } },
-      { categorie: { contains: search, mode: "insensitive" } },
-    ],
+    total,
+    lastPage,
+    currentPage: page,
+    perPage: pageSize,
+    current_page: page,
+    per_page: pageSize,
+    last_page: lastPage,
+    from,
+    to,
   };
 };
 
 export const produitsRouter = createTRPCRouter({
-  list: publicProcedure
+  myList: protectedProcedure
     .input(
       z.object({
         page: z.number().min(1).default(1),
         pageSize: z.number().min(1).max(50).default(12),
         search: z.string().optional(),
+        nom: z.string().optional(),
         categorie: z.string().optional(),
-        minPrix: z.number().optional(),
-        maxPrix: z.number().optional(),
       }),
     )
     .query(async ({ ctx, input }) => {
-      const { page, pageSize, search, categorie, minPrix, maxPrix } = input;
-      const { skip, take } = paginate(page, pageSize);
+      const { page, pageSize, search, categorie } = input;
+      const skip = (page - 1) * pageSize;
 
+      // Get vendeur
+      const vendeur = await ctx.db.vendeur.findUnique({
+        where: { userId: ctx.session.user.id },
+        select: { id: true },
+      });
+
+      if (!vendeur) throw new TRPCError({ code: "FORBIDDEN" });
+
+      // Build search
       const where: Prisma.ProduitsWhereInput = {
-        ...buildSearchWhere(search),
-        ...(categorie && {
-          categorie: { contains: categorie, mode: "insensitive" },
+        vendeurId: vendeur.id,
+        ...(search && {
+          OR: [
+            { nom: { contains: search, mode: "insensitive" } },
+            { description: { contains: search, mode: "insensitive" } },
+            { categorie: { contains: search, mode: "insensitive" } },
+          ],
         }),
-        ...(minPrix || maxPrix
-          ? {
-              prix: {
-                ...(minPrix && { gte: minPrix }),
-                ...(maxPrix && { lte: maxPrix }),
-              },
-            }
-          : {}),
+        ...(categorie && { categorie }),
       };
 
       const [total, produits] = await Promise.all([
@@ -52,9 +78,17 @@ export const produitsRouter = createTRPCRouter({
         ctx.db.produits.findMany({
           where,
           skip,
-          take,
-          include: { vendeur: { include: { user: true } } },
+          take: pageSize,
           orderBy: { createdAt: "desc" },
+          select: {
+            id: true,
+            nom: true,
+            prix: true,
+            unite: true,
+            categorie: true,
+            imageUrl: true,
+            createdAt: true,
+          },
         }),
       ]);
 
@@ -63,57 +97,112 @@ export const produitsRouter = createTRPCRouter({
         meta: buildPaginationMeta(total, page, pageSize),
       };
     }),
-
-  myList: protectedProcedure
-    .input(
-      z.object({
-        page: z.number().default(1),
-        pageSize: z.number().default(10),
-      }),
-    )
-    .query(async ({ ctx, input }) => {
-      const vendeur = await ctx.db.vendeur.findUnique({
-        where: { userId: ctx.session.user.id },
-      });
-      if (!vendeur) throw new TRPCError({ code: "FORBIDDEN" });
-
-      const { skip, take } = paginate(input.page, input.pageSize);
-      const where = { vendeurId: vendeur.id };
-
-      const [total, produits] = await Promise.all([
-        ctx.db.produits.count({ where }),
-        ctx.db.produits.findMany({
-          where,
-          skip,
-          take,
-          orderBy: { createdAt: "desc" },
-        }),
-      ]);
-
-      return {
-        data: produits,
-        meta: buildPaginationMeta(total, input.page, input.pageSize),
-      };
-    }),
-
   create: protectedProcedure
-    .input(
-      z.object({
-        nom: z.string().min(3),
-        prix: z.number().positive(),
-        quantite: z.number().int().min(1),
-        categorie: z.string().optional(),
-        description: z.string().optional(),
-      }),
-    )
+    .input(productInputSchema)
     .mutation(async ({ ctx, input }) => {
       const vendeur = await ctx.db.vendeur.findUnique({
         where: { userId: ctx.session.user.id },
       });
-      if (!vendeur) throw new TRPCError({ code: "FORBIDDEN" });
+
+      if (!vendeur) {
+        throw new TRPCError({
+          code: "FORBIDDEN",
+          message: "Seller account not found",
+        });
+      }
 
       return ctx.db.produits.create({
-        data: { ...input, vendeurId: vendeur.id },
+        data: {
+          vendeurId: vendeur.id,
+          nom: input.nom,
+          description: input.description,
+          prix: input.prix,
+          quantite: input.quantite,
+          unite: input.unite,
+          localisation: input.localisation,
+          categorie: input.categorie,
+          tags: input.tags,
+          statut: input.statut,
+          imageUrl: input.imageUrl ?? null,
+          inventaire: input.inventaire,
+        },
+      });
+    }),
+
+  // Get all products for current seller
+  getMyProducts: protectedProcedure.query(async ({ ctx }) => {
+    const vendeur = await ctx.db.vendeur.findUnique({
+      where: { userId: ctx.session.user.id },
+    });
+
+    if (!vendeur) {
+      throw new TRPCError({ code: "FORBIDDEN" });
+    }
+
+    return ctx.db.produits.findMany({
+      where: { vendeurId: vendeur.id },
+      orderBy: { createdAt: "desc" },
+    });
+  }),
+
+  // Update product
+  update: protectedProcedure
+    .input(productUpdateSchema)
+    .mutation(async ({ ctx, input }) => {
+      const { id, ...data } = input;
+
+      const vendeur = await ctx.db.vendeur.findUnique({
+        where: { userId: ctx.session.user.id },
+      });
+
+      if (!vendeur) {
+        throw new TRPCError({ code: "FORBIDDEN" });
+      }
+
+      // Verify product belongs to seller
+      const product = await ctx.db.produits.findUnique({
+        where: { id },
+      });
+
+      if (!product || product.vendeurId !== vendeur.id) {
+        throw new TRPCError({
+          code: "FORBIDDEN",
+          message: "Product not found or unauthorized",
+        });
+      }
+
+      return ctx.db.produits.update({
+        where: { id },
+        data,
+      });
+    }),
+
+  // Delete product
+  delete: protectedProcedure
+    .input(z.object({ id: z.string() }))
+    .mutation(async ({ ctx, input }) => {
+      const vendeur = await ctx.db.vendeur.findUnique({
+        where: { userId: ctx.session.user.id },
+      });
+
+      if (!vendeur) {
+        throw new TRPCError({ code: "FORBIDDEN" });
+      }
+
+      // Verify product belongs to seller
+      const product = await ctx.db.produits.findUnique({
+        where: { id: input.id },
+      });
+
+      if (!product || product.vendeurId !== vendeur.id) {
+        throw new TRPCError({
+          code: "FORBIDDEN",
+          message: "Product not found or unauthorized",
+        });
+      }
+
+      return ctx.db.produits.delete({
+        where: { id: input.id },
       });
     }),
 });

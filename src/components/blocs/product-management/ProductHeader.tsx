@@ -1,39 +1,24 @@
+// components/vendeur/ProductHeaderWithModal.tsx
+"use client";
+
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Plus } from "lucide-react";
 import { AddProductModal } from "./AddProductModal";
-import type { ProductFormData } from "~/components/blocs/product-management/product-form";
 
-interface ProductHeaderProps {
-  onAddProduct: (data: ProductFormData) => void;
-}
-
-export function ProductHeaderWithModal({ onAddProduct }: ProductHeaderProps) {
+export function ProductHeaderWithModal() {
   const [isModalOpen, setIsModalOpen] = useState(false);
-
-  const handleAddProduct = (data: ProductFormData) => {
-    onAddProduct(data);
-    setIsModalOpen(false);
-  };
-
   return (
     <>
-      <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold">Filter :</h1>
-        <Button
-          className="bg-primary hover:bg-green-700"
-          onClick={() => setIsModalOpen(true)}
-        >
-          <Plus className="h-4 w-4" />
-          New Product
+      <div className="mb-8 flex items-center justify-between">
+        <h1 className="text-3xl font-bold">Mes Produits</h1>
+        <Button onClick={() => setIsModalOpen(true)} className="shadow-lg">
+          <Plus className="mr-2 h-5 w-5" />
+          Nouveau produit
         </Button>
       </div>
 
-      <AddProductModal
-        open={isModalOpen}
-        onClose={() => setIsModalOpen(false)}
-        onSubmit={handleAddProduct}
-      />
+      <AddProductModal open={isModalOpen} onOpenChange={setIsModalOpen} />
     </>
   );
 }

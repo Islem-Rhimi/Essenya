@@ -2,12 +2,27 @@ export interface ProductFormData {
   name: string;
   description: string;
   price: string;
-  unit: string;
+  unit:
+    | "per lb"
+    | "per kg"
+    | "per dozen"
+    | "per piece"
+    | "per bunch"
+    | "per bag"
+    | "per box"
+    | "";
   farmer: string;
   location: string;
-  category: string;
+  category:
+    | "vegetables"
+    | "fruits"
+    | "grains"
+    | "dairy"
+    | "meat"
+    | "herbs"
+    | "";
   tags: string[];
-  status: string;
+  status: "in-stock" | "out-of-stock" | "limited" | "";
   image: File | null;
   inventory: string;
 }
@@ -20,8 +35,6 @@ export interface ProductFormErrors {
   farmer?: string;
   location?: string;
   category?: string;
-  tags?: string;
   status?: string;
-  image?: string;
   inventory?: string;
 }

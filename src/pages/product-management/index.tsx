@@ -198,11 +198,6 @@ export default function ProductManagementPage() {
   const { filters, filteredProducts, updateFilters } =
     useProductFilters(sampleProducts);
 
-  const handleAddProduct = () => {
-    console.log("Add new product");
-    // Navigate to add product page or open modal
-  };
-
   const handleEdit = (productId: number) => {
     console.log("Edit product:", productId);
     // Navigate to edit page or open modal
@@ -218,7 +213,7 @@ export default function ProductManagementPage() {
       <div className="min-h-screen p-6">
         <div className="mx-auto">
           <Card className="mb-6 p-6">
-            <ProductHeaderWithModal onAddProduct={handleAddProduct} />
+            <ProductHeaderWithModal />
             <ProductFilters
               filters={filters}
               onFiltersChange={updateFilters}

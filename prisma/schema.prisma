@@ -131,18 +131,27 @@ model DemandeService {
 
 // Produits model
 model Produits {
-    id          String     @id @default(cuid())
-    nom         String
-    prix        Float
-    quantite    Int
-    categorie   String?
-    description String?
-    vendeurId   String
-    vendeur     Vendeur    @relation(fields: [vendeurId], references: [id], onDelete: Cascade)
-    commandes   Commande[]
+    id           String     @id @default(cuid())
+    nom          String
+    description  String
+    prix         String
+    quantite     String
+    unite        String
+    localisation String
+    categorie    String
+    tags         String[]
+    statut       String
+    imageUrl     String?
+    inventaire   Int
+    vendeurId    String
+    vendeur      Vendeur    @relation(fields: [vendeurId], references: [id], onDelete: Cascade)
+    commandes    Commande[]
+    createdAt    DateTime   @default(now())
+    updatedAt    DateTime   @updatedAt
 
-    createdAt DateTime @default(now())
-    updatedAt DateTime @updatedAt
+    @@index([vendeurId])
+    @@index([categorie])
+    @@index([statut])
 }
 
 // Commande model
