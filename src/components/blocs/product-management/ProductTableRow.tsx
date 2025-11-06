@@ -1,94 +1,118 @@
 import { TableCell, TableRow } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Edit, Trash2, Star } from "lucide-react";
-import type { Product } from "./product";
+import { Edit, Trash2 } from "lucide-react";
 import Image from "next/image";
+import { api } from "~/utils/api";
+import { useState } from "react";
+import type { Produits } from "@prisma/client";
+import { EditProductModal } from "./EditProductModal";
 
 interface ProductTableRowProps {
-  product: Product;
-  onEdit: (productId: number) => void;
-  onDelete: (productId: number) => void;
+  product: Produits;
 }
 
-export function ProductTableRow({
-  product,
-  onEdit,
-  onDelete,
-}: ProductTableRowProps) {
+export function ProductTableRow({ product }: ProductTableRowProps) {
+  const [editOpen, setEditOpen] = useState(false);
+  const utils = api.useUtils();
+  const deleteMutation = api.produits.delete.useMutation({
+    onSuccess: async () => {
+      await utils.produits.getMyProducts.invalidate();
+    },
+  });
+
+  const [deleting, setDeleting] = useState(false);
+
+  const handleDelete = async () => {
+    if (!confirm("Delete this product? This cannot be undone.")) return;
+    setDeleting(true);
+    try {
+      await deleteMutation.mutateAsync({ id: product.id });
+    } finally {
+      setDeleting(false);
+    }
+  };
+
   return (
-    <TableRow className="hover:bg-gray-50/50">
+    <TableRow className="transition-colors hover:bg-gray-50/50">
+      {/* Image + Name */}
       <TableCell>
         <div className="flex items-center gap-3">
-          <Image
-            src={product.image}
-            alt={product.name}
-            width={50}
-            height={50}
-            className="h-12 w-12 rounded-lg bg-gray-100 object-cover"
-          />
-          <span className="font-medium text-gray-900">{product.name}</span>
+          {product.imageUrl ? (
+            <Image
+              src={product.imageUrl}
+              alt={product.nom}
+              width={48}
+              height={48}
+              className="h-12 w-12 rounded-lg object-cover"
+            />
+          ) : (
+            <div className="h-12 w-12 rounded-lg border-2 border-dashed border-gray-300 bg-gray-200" />
+          )}
+          <span className="font-medium text-gray-900">{product.nom}</span>
         </div>
       </TableCell>
+
+      {/* Price */}
       <TableCell>
         <div className="font-semibold text-green-600">
-          {product.price}
-          <span className="ml-1 font-normal text-gray-500">{product.unit}</span>
+          {product.prix}
+          <span className="ml-1 font-normal text-gray-500">
+            / {product.unite}
+          </span>
         </div>
       </TableCell>
+
+      {/* Farmer */}
+
+      {/* Location */}
       <TableCell>
-        <span className="text-gray-900">{product.farmer}</span>
+        <span className="text-gray-700">{product.localisation}</span>
       </TableCell>
+
+      {/* Tags */}
       <TableCell>
-        <span className="text-gray-700">{product.location}</span>
-      </TableCell>
-      <TableCell>
-        <div className="flex items-center gap-1">
-          <Star className="h-4 w-4 fill-yellow-400 text-yellow-400" />
-          <span className="font-medium">{product.rating}</span>
-          <span className="text-sm text-gray-500">({product.ratingCount})</span>
-        </div>
-      </TableCell>
-      <TableCell>
-        <div className="flex flex-wrap items-center gap-1">
+        <div className="flex flex-wrap gap-1">
           {product.tags.map((tag) => (
-            <Badge
-              key={tag}
-              variant="secondary"
-              className="bg-gray-100 text-gray-700 hover:bg-gray-200"
-            >
+            <Badge key={tag} variant="secondary" className="text-xs">
               {tag}
             </Badge>
           ))}
-          {product.additionalTags > 0 && (
-            <span className="text-sm text-gray-500">
-              +{product.additionalTags}
-            </span>
-          )}
         </div>
       </TableCell>
+
+      {/* Status */}
       <TableCell>
         <Badge
-          className={`${product.statusColor} text-white hover:${product.statusColor}/90`}
+          variant={product.statut === "ACTIF" ? "default" : "secondary"}
+          className={
+            product.statut === "ACTIF"
+              ? "bg-green-100 text-green-800"
+              : "bg-gray-100 text-gray-700"
+          }
         >
-          {product.status}
+          {product.statut}
         </Badge>
       </TableCell>
+
+      {/* Actions */}
       <TableCell>
-        <div className="flex items-center gap-2">
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => onEdit(product.id)}
-            className="h-8 w-8 p-0 hover:bg-gray-100"
-          >
-            <Edit className="h-4 w-4 text-gray-600" />
+        <div className="flex gap-2">
+          <Button variant="ghost" size="icon" onClick={() => setEditOpen(true)}>
+            <Edit className="h-4 w-4" />
           </Button>
+          <EditProductModal
+            open={editOpen}
+            onOpenChange={setEditOpen}
+            productId={product.id}
+          />
+
           <Button
             variant="ghost"
-            size="sm"
-            onClick={() => onDelete(product.id)}
-            className="h-8 w-8 p-0 hover:bg-red-50 hover:text-red-600"
+            size="icon"
+            className="h-8 w-8 hover:bg-red-50 hover:text-red-600"
+            disabled={deleting}
+            onClick={handleDelete}
           >
             <Trash2 className="h-4 w-4" />
           </Button>

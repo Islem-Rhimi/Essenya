@@ -5,18 +5,18 @@ import { productUpdateSchema } from "~/validations/product/productUpdateSchema";
 import { productInputSchema } from "~/validations/product/productInputSchema";
 import type { Prisma } from "@prisma/client";
 
-// const buildSearchWhere = (search?: string) => {
-//   if (!search) return {};
+const buildSearchWhere = (search?: string) => {
+  if (!search) return {};
 
-//   return {
-//     OR: [
-//       { nom: { contains: search, mode: "insensitive" as const } },
-//       { description: { contains: search, mode: "insensitive" as const } },
-//       { categorie: { contains: search, mode: "insensitive" as const } },
-//       ...(isNaN(Number(search)) ? [] : [{ year: Number(search) }]),
-//     ],
-//   };
-// };
+  return {
+    OR: [
+      { nom: { contains: search, mode: "insensitive" as const } },
+      { description: { contains: search, mode: "insensitive" as const } },
+      { categorie: { contains: search, mode: "insensitive" as const } },
+      ...(isNaN(Number(search)) ? [] : [{ year: Number(search) }]),
+    ],
+  };
+};
 
 // Helper function to build pagination meta
 const buildPaginationMeta = (total: number, page: number, pageSize: number) => {
@@ -130,20 +130,64 @@ export const produitsRouter = createTRPCRouter({
     }),
 
   // Get all products for current seller
-  getMyProducts: protectedProcedure.query(async ({ ctx }) => {
-    const vendeur = await ctx.db.vendeur.findUnique({
-      where: { userId: ctx.session.user.id },
-    });
+  getMyProducts: protectedProcedure
+    .input(
+      z.object({
+        page: z.number().min(1).default(1),
+        pageSize: z.number().min(1).max(100).default(5),
+        search: z.string().optional(),
+        availability: z.boolean().optional(),
+      }),
+    )
+    .query(async ({ ctx, input }) => {
+      try {
+        const { page, pageSize, search, availability } = input;
+        const skip = (page - 1) * pageSize;
 
-    if (!vendeur) {
-      throw new TRPCError({ code: "FORBIDDEN" });
-    }
+        const searchWhere = buildSearchWhere(search);
+        if (!ctx.session?.user?.id) {
+          throw new TRPCError({
+            code: "UNAUTHORIZED",
+            message: "You must be logged in to view your cars",
+          });
+        }
 
-    return ctx.db.produits.findMany({
-      where: { vendeurId: vendeur.id },
-      orderBy: { createdAt: "desc" },
-    });
-  }),
+        const owner = {
+          vendeur: {
+            userId: ctx.session.user.id,
+          },
+          ...searchWhere,
+          ...(availability !== undefined && { availability }),
+        };
+        const total = await ctx.db.produits.count({
+          where: owner,
+        });
+
+        const produits = await ctx.db.produits.findMany({
+          where: owner,
+          skip,
+          take: pageSize,
+          include: {
+            vendeur: true,
+            commandes: true,
+          },
+          orderBy: {
+            createdAt: "desc",
+          },
+        });
+
+        return {
+          data: produits,
+          meta: buildPaginationMeta(total, page, pageSize),
+        };
+      } catch (error) {
+        throw new TRPCError({
+          code: "INTERNAL_SERVER_ERROR",
+          message: "An error occurred while fetching cars",
+          cause: error,
+        });
+      }
+    }),
 
   // Update product
   update: protectedProcedure

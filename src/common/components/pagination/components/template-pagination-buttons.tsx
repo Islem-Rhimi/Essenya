@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-unsafe-argument */
+/* eslint-disable @typescript-eslint/no-unsafe-assignment */
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { usePagination } from "../hooks/use-pagination";
 import type { QueryMeta } from "@/common/common-types";
@@ -15,7 +17,7 @@ export const TemplatePaginationButtons: React.FC<
 
   // Calculate total pages from total items and items per page
   const totalPages = Math.ceil(
-    (meta?.total || 0) / (meta?.perPage || paginationStates.itemsPerPage),
+    (meta?.total ?? 0) / (meta?.perPage ?? paginationStates.itemsPerPage),
   );
 
   const handlePerPageChange = (newPerPage: number) => {
@@ -33,7 +35,7 @@ export const TemplatePaginationButtons: React.FC<
           title="itemsPerPage"
           value={paginationStates.itemsPerPage}
           onChange={(e) => handlePerPageChange(Number(e.target.value))}
-          className="bg-card-car rounded-lg border-2 border-[rgba(212,175,55,0.3)] px-3 py-2 text-yellow-500 transition-colors hover:border-yellow-500 focus:border-yellow-500 focus:outline-none"
+          className="bg-card-car rounded-lg border-2 border-[rgba(212,175,55,0.3)] px-3 py-2 text-green-500 transition-colors hover:border-green-500 focus:border-green-500 focus:outline-none"
         >
           {perPageOptions.map((option) => (
             <option
@@ -56,7 +58,7 @@ export const TemplatePaginationButtons: React.FC<
             paginationSetStates.setCurrentPage((prev) => Math.max(prev - 1, 1))
           }
           disabled={paginationStates.currentPage === 1}
-          className="flex items-center space-x-2 rounded-lg border-2 border-yellow-500 bg-transparent px-4 py-2 text-yellow-500 transition-all hover:scale-105 hover:bg-yellow-500 hover:text-black disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:scale-100 disabled:hover:bg-transparent disabled:hover:text-yellow-500"
+          className="flex items-center space-x-2 rounded-lg border-2 border-green-500 bg-transparent px-4 py-2 text-green-500 transition-all hover:scale-105 hover:bg-green-500 hover:text-black disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:scale-100 disabled:hover:bg-transparent disabled:hover:text-green-500"
         >
           <ChevronLeft className="h-4 w-4" />
           <span>Précédent</span>
@@ -69,7 +71,7 @@ export const TemplatePaginationButtons: React.FC<
             <>
               <button
                 onClick={() => paginationSetStates.setCurrentPage(1)}
-                className="h-10 w-10 rounded-lg border-2 border-yellow-500 bg-transparent text-yellow-500 transition-all hover:scale-105 hover:bg-yellow-500 hover:text-black"
+                className="h-10 w-10 rounded-lg border-2 border-green-500 bg-transparent text-green-500 transition-all hover:scale-105 hover:bg-green-500 hover:text-black"
               >
                 1
               </button>
@@ -114,8 +116,8 @@ export const TemplatePaginationButtons: React.FC<
                 onClick={() => paginationSetStates.setCurrentPage(pageNum)}
                 className={`h-10 w-10 rounded-lg border-2 transition-all ${
                   isActive
-                    ? "scale-110 border-yellow-500 bg-yellow-500 font-semibold text-black shadow-lg shadow-yellow-500/30"
-                    : "border-yellow-500 bg-transparent text-yellow-500 hover:scale-105 hover:bg-yellow-500 hover:text-black"
+                    ? "scale-110 border-green-500 bg-green-500 font-semibold text-black shadow-lg shadow-green-500/30"
+                    : "border-green-500 bg-transparent text-green-500 hover:scale-105 hover:bg-green-500 hover:text-black"
                 }`}
               >
                 {pageNum}
@@ -131,7 +133,7 @@ export const TemplatePaginationButtons: React.FC<
               )}
               <button
                 onClick={() => paginationSetStates.setCurrentPage(totalPages)}
-                className="h-10 w-10 rounded-lg border-2 border-yellow-500 bg-transparent text-yellow-500 transition-all hover:scale-105 hover:bg-yellow-500 hover:text-black"
+                className="h-10 w-10 rounded-lg border-2 border-green-500 bg-transparent text-green-500 transition-all hover:scale-105 hover:bg-green-500 hover:text-black"
               >
                 {totalPages}
               </button>
@@ -147,7 +149,7 @@ export const TemplatePaginationButtons: React.FC<
             )
           }
           disabled={paginationStates.currentPage === totalPages}
-          className="flex items-center space-x-2 rounded-lg border-2 border-yellow-500 bg-transparent px-4 py-2 text-yellow-500 transition-all hover:scale-105 hover:bg-yellow-500 hover:text-black disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:scale-100 disabled:hover:bg-transparent disabled:hover:text-yellow-500"
+          className="flex items-center space-x-2 rounded-lg border-2 border-green-500 bg-transparent px-4 py-2 text-green-500 transition-all hover:scale-105 hover:bg-green-500 hover:text-black disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:scale-100 disabled:hover:bg-transparent disabled:hover:text-green-500"
         >
           <span>Suivant</span>
           <ChevronRight className="h-4 w-4" />
