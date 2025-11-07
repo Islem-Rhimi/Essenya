@@ -104,7 +104,7 @@ export function ProductTableRow({ product }: ProductTableRowProps) {
           <EditProductModal
             open={editOpen}
             onOpenChange={setEditOpen}
-            productId={product.id}
+            product={product}
           />
 
           <Button

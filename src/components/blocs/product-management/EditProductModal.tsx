@@ -36,37 +36,25 @@ import {
   type Statut,
   type Unit,
 } from "~/validations/product/productUpdateSchema";
+import type { Produits } from "@prisma/client";
+import { toast } from "sonner";
 
 interface EditProductModalProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  productId: string;
+  product: Produits;
 }
 
 export function EditProductModal({
   open,
   onOpenChange,
-  productId,
+  product,
 }: EditProductModalProps) {
-  const [uploadedUrl, setUploadedUrl] = useState<string>("");
-  const [isUploading, setIsUploading] = useState(false);
-
-  const utils = api.useUtils();
-
-  const { data: product, isLoading } = api.produits.getMyProducts.useQuery(
-    { page: 1, pageSize: 1, search: productId },
-    { enabled: open && !!productId },
+  const [uploadedUrl, setUploadedUrl] = useState<string>(
+    product.imageUrl ?? "",
   );
-
-  const updateMutation = api.produits.update.useMutation({
-    onSuccess: async () => {
-      await utils.produits.getMyProducts.invalidate();
-      onOpenChange(false);
-    },
-    onError: (error) => {
-      alert(`Erreur: ${error.message}`);
-    },
-  });
+  const [isUploading, setIsUploading] = useState(false);
+  const utils = api.useUtils();
 
   const {
     register,
@@ -77,30 +65,53 @@ export function EditProductModal({
     formState: { errors, isSubmitting },
   } = useForm<productUpdateSchemaType>({
     resolver: zodResolver(productUpdateSchema),
+    defaultValues: {
+      id: product.id,
+      nom: product.nom,
+      description: product.description,
+      prix: product.prix,
+      quantite: product.quantite,
+      unite: product.unite as Unit,
+      localisation: product.localisation,
+      categorie: product.categorie as Categorie,
+      tags: product.tags,
+      statut: product.statut as Statut,
+      imageUrl: product.imageUrl ?? "",
+      inventaire: product.inventaire,
+    },
+  });
+
+  const updateMutation = api.produits.update.useMutation({
+    onSuccess: async () => {
+      toast.success("Voiture modifiée avec succès!");
+      await utils.produits.getMyProducts.invalidate();
+      onOpenChange(false);
+    },
+    onError: (error) => {
+      alert(`Erreur: ${error.message}`);
+    },
   });
 
   const tags = watch("tags") || [];
   useEffect(() => {
-    if (product?.data[0]) {
-      const p = product.data[0];
+    if (!product) return;
 
-      reset({
-        id: p.id,
-        nom: p.nom,
-        description: p.description,
-        prix: p.prix,
-        quantite: p.quantite,
-        unite: p.unite as Unit, // ← CAST
-        localisation: p.localisation,
-        categorie: p.categorie as Categorie, // ← CAST
-        tags: p.tags,
-        statut: p.statut as Statut, // ← CAST
-        imageUrl: p.imageUrl ?? "",
-        inventaire: p.inventaire,
-      });
+    reset({
+      id: product.id,
+      nom: product.nom,
+      description: product.description,
+      prix: product.prix,
+      quantite: product.quantite,
+      unite: product.unite as Unit,
+      localisation: product.localisation,
+      categorie: product.categorie as Categorie,
+      tags: product.tags,
+      statut: product.statut as Statut,
+      imageUrl: product.imageUrl ?? "",
+      inventaire: product.inventaire,
+    });
 
-      setUploadedUrl(p.imageUrl ?? "");
-    }
+    setUploadedUrl(product.imageUrl ?? "");
   }, [product, reset]);
 
   const onDrop = async (acceptedFiles: File[]) => {
@@ -129,17 +140,17 @@ export function EditProductModal({
     await updateMutation.mutateAsync(data);
   };
 
-  if (isLoading) {
-    return (
-      <Dialog open={open} onOpenChange={onOpenChange}>
-        <DialogContent>
-          <div className="py-10 text-center">
-            <Loader2 className="mx-auto h-8 w-8 animate-spin" />
-          </div>
-        </DialogContent>
-      </Dialog>
-    );
-  }
+  // if (isLoading) {
+  //   return (
+  //     <Dialog open={open} onOpenChange={onOpenChange}>
+  //       <DialogContent>
+  //         <div className="py-10 text-center">
+  //           <Loader2 className="mx-auto h-8 w-8 animate-spin" />
+  //         </div>
+  //       </DialogContent>
+  //     </Dialog>
+  //   );
+  // }
 
   return (
     <Dialog
