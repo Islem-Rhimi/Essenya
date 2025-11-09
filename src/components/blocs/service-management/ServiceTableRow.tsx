@@ -1,97 +1,87 @@
 import { TableCell, TableRow } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Edit, Trash2, Star } from "lucide-react";
-import type { Service } from "./service";
+import { Edit } from "lucide-react";
 import Image from "next/image";
+import { useState } from "react";
+import type { Services } from "@prisma/client";
+import { EditServiceModal } from "./EditServiceModal";
+import { DeleteServiceModal } from "./DeleteServiceModal";
 
 interface ServiceTableRowProps {
-  service: Service;
-  onEdit: (serviceId: number) => void;
-  onDelete: (serviceId: number) => void;
+  service: Services;
 }
 
-export function ServiceTableRow({
-  service,
-  onEdit,
-  onDelete,
-}: ServiceTableRowProps) {
+export function ServiceTableRow({ service }: ServiceTableRowProps) {
+  const [editOpen, setEditOpen] = useState(false);
   return (
-    <TableRow className="hover:bg-gray-50/50">
-      <TableCell>
+    <TableRow className="transition-colors hover:bg-gray-50/50">
+      {/* Image + Name */}
+      <TableCell className="pl-8">
         <div className="flex items-center gap-3">
-          <Image
-            src={service.image}
-            alt={service.name}
-            width={50}
-            height={50}
-            className="h-12 w-12 rounded-lg bg-gray-100 object-cover"
-          />
-          <span className="font-medium text-gray-900">{service.name}</span>
+          {service.imageUrl ? (
+            <Image
+              src={service.imageUrl}
+              alt={service.nom}
+              width={48}
+              height={48}
+              className="h-12 w-12 rounded-lg object-cover"
+            />
+          ) : (
+            <div className="h-12 w-12 rounded-lg border-2 border-dashed border-gray-300 bg-gray-200" />
+          )}
+          <span className="font-medium text-gray-900 dark:text-amber-100">
+            {service.nom}
+          </span>
         </div>
       </TableCell>
+
+      {/* Price */}
       <TableCell>
         <div className="font-semibold text-green-600">
-          {service.price}
-          <span className="ml-1 font-normal text-gray-500">{service.unit}</span>
+          {service.prix}
+          <span className="ml-1 font-normal text-gray-500">/ par heure</span>
         </div>
       </TableCell>
+
+      {/* Tags */}
       <TableCell>
-        <span className="text-gray-900">{service.farmer}</span>
-      </TableCell>
-      <TableCell>
-        <span className="text-gray-700">{service.location}</span>
-      </TableCell>
-      <TableCell>
-        <div className="flex items-center gap-1">
-          <Star className="h-4 w-4 fill-yellow-400 text-yellow-400" />
-          <span className="font-medium">{service.rating}</span>
-          <span className="text-sm text-gray-500">({service.ratingCount})</span>
-        </div>
-      </TableCell>
-      <TableCell>
-        <div className="flex flex-wrap items-center gap-1">
-          {service.tags.map((tag) => (
-            <Badge
-              key={tag}
-              variant="secondary"
-              className="bg-gray-100 text-gray-700 hover:bg-gray-200"
-            >
-              {tag}
+        <div className="flex flex-wrap gap-1">
+          {service.types.map((type) => (
+            <Badge key={type} variant="secondary" className="text-xs">
+              {type}
             </Badge>
           ))}
-          {service.additionalTags > 0 && (
-            <span className="text-sm text-gray-500">
-              +{service.additionalTags}
-            </span>
-          )}
         </div>
       </TableCell>
+
       <TableCell>
-        <Badge
-          className={`${service.statusColor} text-white hover:${service.statusColor}/90`}
-        >
-          {service.status}
-        </Badge>
+        <div className="font-medium text-gray-900 dark:text-amber-100">
+          {service.description}
+        </div>
       </TableCell>
-      <TableCell>
-        <div className="flex items-center gap-2">
+
+      {/* Actions */}
+      <TableCell className="flex justify-center">
+        <div className="flex gap-2">
           <Button
+            className="flex items-center space-x-2 border border-blue-500/30 bg-white text-blue-500 transition hover:bg-blue-500/10 dark:bg-transparent"
             variant="ghost"
-            size="sm"
-            onClick={() => onEdit(service.id)}
-            className="h-8 w-8 p-0 hover:bg-gray-100"
+            size="icon"
+            onClick={() => setEditOpen(true)}
           >
-            <Edit className="h-4 w-4 text-gray-600" />
+            <Edit className="h-4 w-4" />
           </Button>
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => onDelete(service.id)}
-            className="h-8 w-8 p-0 hover:bg-red-50 hover:text-red-600"
-          >
-            <Trash2 className="h-4 w-4" />
-          </Button>
+          <EditServiceModal
+            open={editOpen}
+            onOpenChange={setEditOpen}
+            service={service}
+          />
+
+          <DeleteServiceModal
+            serviceId={service.id}
+            serviceName={service.nom}
+          />
         </div>
       </TableCell>
     </TableRow>

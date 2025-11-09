@@ -59,6 +59,7 @@ model User {
     reservations      Reservation[]
     servicesRequested DemandeService[] @relation("UserDemandeService")
     commandesPassed   Commande[]
+    demmandes         Demmande[]
 }
 
 model VerificationToken {
@@ -85,8 +86,9 @@ model Vendeur {
     produits   Produits[]
     evenements Evenement[]
 
-    createdAt DateTime @default(now())
-    updatedAt DateTime @updatedAt
+    createdAt DateTime   @default(now())
+    updatedAt DateTime   @updatedAt
+    services  Services[]
 }
 
 // Contact model
@@ -106,13 +108,17 @@ model Contact {
 model Services {
     id              String           @id @default(cuid())
     nom             String
-    type            String
-    description     String?
-    prix            Float
+    types           String[]
+    description     String
+    imageUrl        String?
+    prix            String
     demandeServices DemandeService[]
+    vendeurId       String
+    vendeur         Vendeur          @relation(fields: [vendeurId], references: [id], onDelete: Cascade)
 
-    createdAt DateTime @default(now())
-    updatedAt DateTime @updatedAt
+    createdAt DateTime   @default(now())
+    updatedAt DateTime   @updatedAt
+    demmandes Demmande[]
 }
 
 // Demande Service model
@@ -169,6 +175,21 @@ model Commande {
     updatedAt DateTime @updatedAt
 }
 
+model Demmande {
+    id        String    @id @default(cuid())
+    date      DateTime  @default(now())
+    statut    String
+    userId    String
+    serviceId String
+    user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+    service   Services  @relation(fields: [serviceId], references: [id], onDelete: Cascade)
+    paiement  Paiement? @relation(fields: [paiementId], references: [id])
+
+    createdAt  DateTime @default(now())
+    updatedAt  DateTime @updatedAt
+    paiementId String?
+}
+
 // Paiement model
 model Paiement {
     id         String   @id @default(cuid())
@@ -177,25 +198,23 @@ model Paiement {
     commandeId String   @unique
     commande   Commande @relation(fields: [commandeId], references: [id], onDelete: Cascade)
 
-    createdAt DateTime @default(now())
-    updatedAt DateTime @updatedAt
+    createdAt DateTime   @default(now())
+    updatedAt DateTime   @updatedAt
+    demmandes Demmande[]
 }
 
 // Evenement model
 model Evenement {
-    id             String        @id @default(cuid())
-    nom            String
-    description    String?
-    date           DateTime
-    lieu           String
-    duree          String?
-    nbPlaces       Int
-    organisateurId String
-    organisateur   Vendeur       @relation(fields: [organisateurId], references: [id], onDelete: Cascade)
-    reservations   Reservation[]
-
-    createdAt DateTime @default(now())
-    updatedAt DateTime @updatedAt
+    id           String        @id @default(cuid())
+    title        String
+    description  String?
+    localisation String
+    date         DateTime
+    color        String        @default("#D4AF37")
+    vendeurId    String
+    vendeur      Vendeur       @relation(fields: [vendeurId], references: [id])
+    createdAt    DateTime      @default(now())
+    reservations Reservation[]
 }
 
 // Reservation model

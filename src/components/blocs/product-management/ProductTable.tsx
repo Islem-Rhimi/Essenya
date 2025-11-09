@@ -68,12 +68,14 @@ export const ProductTable: React.FC<ProductTableProps> = ({ searchValue }) => {
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead>Product</TableHead>
-              <TableHead>Price</TableHead>
-              <TableHead>Location</TableHead>
-              <TableHead>Tags</TableHead>
-              <TableHead>Status</TableHead>
-              <TableHead>Actions</TableHead>
+              <TableHead className="px-4 py-3 pl-8">Product</TableHead>
+              <TableHead className="px-4 py-3">Price</TableHead>
+              <TableHead className="px-4 py-3">Location</TableHead>
+              <TableHead className="px-4 py-3">Tags</TableHead>
+              <TableHead className="px-4 py-3">Status</TableHead>
+              <TableHead className="flex justify-center px-4 py-3">
+                Actions
+              </TableHead>
             </TableRow>
           </TableHeader>
 

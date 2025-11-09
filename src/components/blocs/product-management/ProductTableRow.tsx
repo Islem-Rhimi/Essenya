@@ -1,12 +1,12 @@
 import { TableCell, TableRow } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Edit, Trash2 } from "lucide-react";
+import { Edit } from "lucide-react";
 import Image from "next/image";
-import { api } from "~/utils/api";
 import { useState } from "react";
 import type { Produits } from "@prisma/client";
 import { EditProductModal } from "./EditProductModal";
+import { DeleteProductModal } from "./DeleteProductModal";
 
 interface ProductTableRowProps {
   product: Produits;
@@ -14,29 +14,10 @@ interface ProductTableRowProps {
 
 export function ProductTableRow({ product }: ProductTableRowProps) {
   const [editOpen, setEditOpen] = useState(false);
-  const utils = api.useUtils();
-  const deleteMutation = api.produits.delete.useMutation({
-    onSuccess: async () => {
-      await utils.produits.getMyProducts.invalidate();
-    },
-  });
-
-  const [deleting, setDeleting] = useState(false);
-
-  const handleDelete = async () => {
-    if (!confirm("Delete this product? This cannot be undone.")) return;
-    setDeleting(true);
-    try {
-      await deleteMutation.mutateAsync({ id: product.id });
-    } finally {
-      setDeleting(false);
-    }
-  };
-
   return (
     <TableRow className="transition-colors hover:bg-gray-50/50">
       {/* Image + Name */}
-      <TableCell>
+      <TableCell className="pl-8">
         <div className="flex items-center gap-3">
           {product.imageUrl ? (
             <Image
@@ -49,7 +30,9 @@ export function ProductTableRow({ product }: ProductTableRowProps) {
           ) : (
             <div className="h-12 w-12 rounded-lg border-2 border-dashed border-gray-300 bg-gray-200" />
           )}
-          <span className="font-medium text-gray-900">{product.nom}</span>
+          <span className="font-medium text-gray-900 dark:text-amber-100">
+            {product.nom}
+          </span>
         </div>
       </TableCell>
 
@@ -66,8 +49,10 @@ export function ProductTableRow({ product }: ProductTableRowProps) {
       {/* Farmer */}
 
       {/* Location */}
-      <TableCell>
-        <span className="text-gray-700">{product.localisation}</span>
+      <TableCell className="flex-col justify-center">
+        <span className="text-gray-700 dark:text-white">
+          {product.localisation}
+        </span>
       </TableCell>
 
       {/* Tags */}
@@ -96,9 +81,14 @@ export function ProductTableRow({ product }: ProductTableRowProps) {
       </TableCell>
 
       {/* Actions */}
-      <TableCell>
+      <TableCell className="flex justify-center">
         <div className="flex gap-2">
-          <Button variant="ghost" size="icon" onClick={() => setEditOpen(true)}>
+          <Button
+            className="flex items-center space-x-2 border border-blue-500/30 bg-white text-blue-500 transition hover:bg-blue-500/10 dark:bg-transparent"
+            variant="ghost"
+            size="icon"
+            onClick={() => setEditOpen(true)}
+          >
             <Edit className="h-4 w-4" />
           </Button>
           <EditProductModal
@@ -107,15 +97,10 @@ export function ProductTableRow({ product }: ProductTableRowProps) {
             product={product}
           />
 
-          <Button
-            variant="ghost"
-            size="icon"
-            className="h-8 w-8 hover:bg-red-50 hover:text-red-600"
-            disabled={deleting}
-            onClick={handleDelete}
-          >
-            <Trash2 className="h-4 w-4" />
-          </Button>
+          <DeleteProductModal
+            produitId={product.id}
+            produitName={product.nom}
+          />
         </div>
       </TableCell>
     </TableRow>

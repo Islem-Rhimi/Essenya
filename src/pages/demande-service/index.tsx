@@ -1,7 +1,7 @@
 "use client";
 
-import DivContent from "~/components/demande-service/DivContent";
-import Tabs from "~/components/demande-service/tabs";
+import DivContent from "~/components/blocs/demande-service/DivContent";
+import Tabs from "~/components/blocs/demande-service/tabs";
 import { MainLayout } from "~/layouts";
 
 const DemandeService = () => {
