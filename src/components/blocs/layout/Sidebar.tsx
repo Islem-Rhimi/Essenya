@@ -117,16 +117,6 @@ const MENU_BY_ROLE: Record<NonNullable<Role>, NavItem[]> = {
       icon: CalendarDays,
     },
     {
-      name: "Product Management",
-      href: "/product-management",
-      icon: PackageCheck,
-    },
-    {
-      name: "Event Management",
-      href: "/event-management",
-      icon: CalendarCheck,
-    },
-    {
       name: "Service Management",
       href: "/service-management",
       icon: Wrench,

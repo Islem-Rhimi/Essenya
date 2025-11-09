@@ -47,10 +47,10 @@ export default function SessionTypeSelection() {
                   <Store className="text-primary h-10 w-10" />
                 </div>
                 <CardTitle className="text-2xl font-bold">
-                  Je suis Vendeur
+                  Je suis Vendeur 
                 </CardTitle>
                 <CardDescription className="mt-3 text-base">
-                  Gérez votre boutique, ajoutez des produits et organisez des
+                  Gérez votre espace, ajoutez des produits et organisez des
                   événements
                 </CardDescription>
               </CardHeader>
@@ -75,12 +75,12 @@ export default function SessionTypeSelection() {
                   Je suis Client
                 </CardTitle>
                 <CardDescription className="mt-3 text-base">
-                  Découvrez les boutiques, réservez des événements et commandez
+                  Découvrez les services, réservez des événements et commandez
                 </CardDescription>
               </CardHeader>
               <CardContent className="border-t pt-6">
                 <div className="text-primary flex items-center justify-center gap-3 font-medium">
-                  <span>Explorer les boutiques</span>
+                  <span>Explorer </span> 
                   <ArrowRight className="h-5 w-5 transition-transform group-hover:translate-x-2" />
                 </div>
               </CardContent>
