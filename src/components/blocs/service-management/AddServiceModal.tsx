@@ -19,11 +19,18 @@ import { Badge } from "@/components/ui/badge";
 import { X, Upload, Loader2, Check } from "lucide-react";
 import { api } from "~/utils/api";
 import {
-  predefinedTypes,
+  predefinedTags,
   serviceInputSchema,
   type serviceInputSchemaType,
 } from "~/validations/service/serviceInputSchema";
 import Image from "next/image";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "~/components/ui/select";
 
 interface AddServiceModalProps {
   open: boolean;
@@ -34,7 +41,6 @@ export function AddServiceModal({ open, onOpenChange }: AddServiceModalProps) {
   const [uploadedUrl, setUploadedUrl] = useState<string>("");
   const [isUploading, setIsUploading] = useState(false);
   const utils = api.useUtils();
-
   const createMutation = api.services.create.useMutation({
     onSuccess: async () => {
       console.log("✅ service created successfully!");
@@ -62,12 +68,13 @@ export function AddServiceModal({ open, onOpenChange }: AddServiceModalProps) {
       nom: "",
       description: "",
       prix: "",
-      types: [],
+      types: "",
+      tags: [],
       imageUrl: "",
     },
   });
-
-  const types = watch("types") || [];
+  const selectedType = watch("types");
+  const tags = watch("tags") || [];
   const currentValues = watch();
 
   const onDrop = async (acceptedFiles: File[]) => {
@@ -275,12 +282,26 @@ export function AddServiceModal({ open, onOpenChange }: AddServiceModalProps) {
               )}
             </div>
           </div>
+          <Select
+            value={selectedType}
+            onValueChange={(value) => setValue("types", value)}
+          >
+            <SelectTrigger className="w-full sm:w-auto">
+              <SelectValue placeholder="Select category" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="All Services">All Services</SelectItem>
+              <SelectItem value="Machines">Machines</SelectItem>
+              <SelectItem value="Labor">Labor</SelectItem>
+              <SelectItem value="Veterinary">Veterinary</SelectItem>
+            </SelectContent>
+          </Select>
 
           {/* TAGS */}
           <div className="space-y-4">
             <Label>Étiquettes</Label>
             <div className="flex flex-wrap gap-2">
-              {types.map((t, index) => (
+              {tags.map((t, index) => (
                 <Badge
                   key={index}
                   variant="secondary"
@@ -292,8 +313,8 @@ export function AddServiceModal({ open, onOpenChange }: AddServiceModalProps) {
                     className="hover:bg-destructive/20 ml-1 rounded-full"
                     onClick={() =>
                       setValue(
-                        "types",
-                        types.filter((x) => x !== t),
+                        "tags",
+                        tags.filter((x) => x !== t),
                       )
                     }
                   >
@@ -309,8 +330,8 @@ export function AddServiceModal({ open, onOpenChange }: AddServiceModalProps) {
                   if (e.key === "Enter") {
                     e.preventDefault();
                     const val = e.currentTarget.value.trim();
-                    if (val && !types.includes(val)) {
-                      setValue("types", [...types, val]);
+                    if (val && !tags.includes(val)) {
+                      setValue("tags", [...tags, val]);
                       e.currentTarget.value = "";
                     }
                   }
@@ -318,15 +339,15 @@ export function AddServiceModal({ open, onOpenChange }: AddServiceModalProps) {
               />
             </div>
             <div className="flex flex-wrap gap-2">
-              {predefinedTypes
-                .filter((t) => !types.includes(t))
+              {predefinedTags
+                .filter((t) => !tags.includes(t))
                 .map((t, index) => (
                   <Button
                     key={index}
                     type="button"
                     variant="outline"
                     size="sm"
-                    onClick={() => setValue("types", [...types, t])}
+                    onClick={() => setValue("tags", [...tags, t])}
                   >
                     + {t}
                   </Button>

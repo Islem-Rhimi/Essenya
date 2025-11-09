@@ -14,15 +14,28 @@ import {
   CalendarDays,
   X,
   HandPlatter,
+  CalendarCheck,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import clsx from "clsx";
+import { useSession } from "next-auth/react";
+import type { Session } from "@prisma/client";
 
+interface NavItem {
+  name: string;
+  href: string;
+  icon: React.ComponentType<{ className?: string }>;
+}
+type Role = "ADMIN" | "VENDEUR" | "CLIENT" | null;
 const navItems = [
   { name: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
   { name: "Services", href: "/farm-service", icon: HandPlatter },
   { name: "Tourism", href: "/tourism", icon: Plane },
-  { name: "Profile", href: "/profile", icon: User },
+  {
+    name: "Event",
+    href: "/event",
+    icon: CalendarDays,
+  },
   {
     name: "Product Management",
     href: "/product-management",
@@ -31,17 +44,109 @@ const navItems = [
   {
     name: "Event Management",
     href: "/event-management",
-    icon: CalendarDays,
+    icon: CalendarCheck,
   },
   {
     name: "Service Management",
     href: "/service-management",
     icon: Wrench,
   },
+  { name: "Profile", href: "/profile", icon: User },
 ];
 
+const MENU_BY_ROLE: Record<NonNullable<Role>, NavItem[]> = {
+  ADMIN: [
+    { name: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
+    { name: "Services", href: "/farm-service", icon: HandPlatter },
+    { name: "Tourism", href: "/tourism", icon: Plane },
+    {
+      name: "Event",
+      href: "/event",
+      icon: CalendarDays,
+    },
+    {
+      name: "Product Management",
+      href: "/product-management",
+      icon: PackageCheck,
+    },
+    {
+      name: "Event Management",
+      href: "/event-management",
+      icon: CalendarCheck,
+    },
+    {
+      name: "Service Management",
+      href: "/service-management",
+      icon: Wrench,
+    },
+    { name: "Profile", href: "/profile", icon: User },
+  ],
+  VENDEUR: [
+    { name: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
+    { name: "Services", href: "/farm-service", icon: HandPlatter },
+    { name: "Tourism", href: "/tourism", icon: Plane },
+    {
+      name: "Event",
+      href: "/event",
+      icon: CalendarDays,
+    },
+    {
+      name: "Product Management",
+      href: "/product-management",
+      icon: PackageCheck,
+    },
+    {
+      name: "Event Management",
+      href: "/event-management",
+      icon: CalendarCheck,
+    },
+    {
+      name: "Service Management",
+      href: "/service-management",
+      icon: Wrench,
+    },
+    { name: "Profile", href: "/profile", icon: User },
+  ],
+  CLIENT: [
+    { name: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
+    { name: "Services", href: "/farm-service", icon: HandPlatter },
+    { name: "Tourism", href: "/tourism", icon: Plane },
+    {
+      name: "Event",
+      href: "/event",
+      icon: CalendarDays,
+    },
+    {
+      name: "Product Management",
+      href: "/product-management",
+      icon: PackageCheck,
+    },
+    {
+      name: "Event Management",
+      href: "/event-management",
+      icon: CalendarCheck,
+    },
+    {
+      name: "Service Management",
+      href: "/service-management",
+      icon: Wrench,
+    },
+    { name: "Profile", href: "/profile", icon: User },
+  ],
+};
+
 export default function Sidebar() {
+  const { data: session, status } = useSession();
   const [collapsed, setCollapsed] = useState(true);
+
+  const role = (session as unknown as Session)?.sessionType as Role;
+  const navItems = role ? (MENU_BY_ROLE[role] ?? []) : [];
+
+  if (status === "loading") {
+    return (
+      <aside className="bg-card-car sticky top-0 hidden w-16 flex-col md:flex" />
+    );
+  }
 
   return (
     <aside

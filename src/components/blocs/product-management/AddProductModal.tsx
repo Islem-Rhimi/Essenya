@@ -49,8 +49,7 @@ export function AddProductModal({ open, onOpenChange }: AddProductModalProps) {
 
   const createMutation = api.produits.create.useMutation({
     onSuccess: async () => {
-      console.log("✅ Product created successfully!");
-      await utils.produits.myList.invalidate();
+      await utils.produits.getMyProducts.invalidate();
       onOpenChange(false);
       reset();
       setUploadedUrl("");

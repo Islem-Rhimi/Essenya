@@ -2,43 +2,20 @@ import Image from "next/image";
 import { Heart, ShoppingCart, MapPin, Star } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import type { Produits } from "@prisma/client";
 
 interface ProductCardProps {
-  product: {
-    name: string;
-    description: string;
-    image: string;
-    price: number;
-    unit: string;
-    tags: string[];
-    location: string;
-    rating: number;
-    reviews: number;
-    inStock: boolean;
-  };
+  product: Produits;
 }
 
 export default function ProductCard({ product }: ProductCardProps) {
-  const {
-    name,
-    description,
-    image,
-    price,
-    unit,
-    tags,
-    location,
-    rating,
-    reviews,
-    inStock,
-  } = product;
-
   return (
     <div className="group bg-card relative rounded-lg border shadow-sm transition-shadow duration-200 hover:shadow-md">
       {/* Image Container */}
       <div className="relative h-48 w-full overflow-hidden rounded-t-lg">
         <Image
-          src={image}
-          alt={name}
+          src={product.imageUrl ?? ""}
+          alt={product.nom}
           fill
           className="object-cover transition-transform duration-300 group-hover:scale-105"
         />
@@ -49,7 +26,7 @@ export default function ProductCard({ product }: ProductCardProps) {
         </Button>
 
         {/* Out of Stock Badge */}
-        {!inStock && (
+        {!product.statut && (
           <div className="absolute top-3 left-3 rounded-md bg-red-500 px-2 py-1 text-xs font-medium text-white">
             Out of Stock
           </div>
@@ -60,7 +37,7 @@ export default function ProductCard({ product }: ProductCardProps) {
       <div className="space-y-3 p-4">
         {/* Tags */}
         <div className="flex flex-wrap gap-1">
-          {tags.map((tag) => (
+          {product.tags.map((tag) => (
             <Badge
               key={tag}
               variant="secondary"
@@ -73,17 +50,17 @@ export default function ProductCard({ product }: ProductCardProps) {
 
         {/* Product Name */}
         <h3 className="text-foreground text-lg leading-tight font-semibold">
-          {name}
+          {product.nom}
         </h3>
 
         {/* Location */}
         <div className="text-muted-foreground flex items-center gap-1 text-sm">
           <MapPin className="h-3 w-3" />
-          <span>{location}</span>
+          <span>{product.localisation}</span>
         </div>
 
         {/* Rating */}
-        <div className="flex items-center gap-1">
+        {/* <div className="flex items-center gap-1">
           <Star className="h-4 w-4 fill-yellow-400 text-yellow-400" />
           <span className="text-foreground text-sm font-medium">
             {rating.toFixed(1)}
@@ -91,21 +68,23 @@ export default function ProductCard({ product }: ProductCardProps) {
           <span className="text-muted-foreground text-sm">
             ({reviews} reviews)
           </span>
-        </div>
+        </div> */}
 
         {/* Price and Add to Cart */}
         <div className="flex items-center justify-between pt-2">
           <div className="flex flex-col">
             <span className="text-xl font-bold text-green-600">
-              ${price.toFixed(2)}
+              ${product.prix}
             </span>
-            <span className="text-muted-foreground text-xs">per {unit}</span>
+            <span className="text-muted-foreground text-xs">
+              per {product.unite}
+            </span>
           </div>
 
           <Button
             size="sm"
             className="bg-green-600 text-white hover:bg-green-700"
-            disabled={!inStock}
+            disabled={!product.statut}
           >
             <ShoppingCart className="mr-1 h-4 w-4" />
             Add to Cart

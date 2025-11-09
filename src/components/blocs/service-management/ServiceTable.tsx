@@ -68,11 +68,11 @@ export const ServiceTable: React.FC<ServiceTableProps> = ({ searchValue }) => {
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead className="px-4 py-3 pl-8">Product</TableHead>
+              <TableHead className="px-4 py-3 pl-8">Services</TableHead>
               <TableHead className="px-4 py-3">Price</TableHead>
-              <TableHead className="px-4 py-3">Location</TableHead>
+              <TableHead className="px-4 py-3">Type</TableHead>
               <TableHead className="px-4 py-3">Tags</TableHead>
-              <TableHead className="px-4 py-3">Status</TableHead>
+              <TableHead className="px-4 py-3">description</TableHead>
               <TableHead className="flex justify-center px-4 py-3">
                 Actions
               </TableHead>

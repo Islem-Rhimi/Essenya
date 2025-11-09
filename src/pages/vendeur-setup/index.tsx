@@ -16,7 +16,15 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
-import { Store, MapPin, Camera, CheckCircle } from "lucide-react";
+import {
+  Store,
+  MapPin,
+  Camera,
+  CheckCircle,
+  Check,
+  Loader2,
+  Upload,
+} from "lucide-react";
 import { useRouter } from "next/navigation";
 import { api } from "~/utils/api";
 import {
@@ -24,8 +32,12 @@ import {
   type venduerInputSchemaType,
 } from "~/validations/vendeurInputSchema";
 import { toast } from "sonner";
+import Image from "next/image";
+import { Badge } from "~/components/ui/badge";
 
 export default function VendeurSetupWizard() {
+  const [uploadedUrl, setUploadedUrl] = useState<string>("");
+  const [isUploading, setIsUploading] = useState(false);
   const [step, setStep] = useState(1);
   const router = useRouter();
   const utils = api.useUtils();
@@ -33,6 +45,7 @@ export default function VendeurSetupWizard() {
   const {
     register,
     handleSubmit,
+    setValue,
     formState: { errors, isSubmitting },
     watch,
   } = useForm<venduerInputSchemaType>({
@@ -56,9 +69,49 @@ export default function VendeurSetupWizard() {
     createMutation.mutate({
       nomBoutique: data.nomBoutique,
       adresse: data.adresse,
-      description: data.description ?? undefined,
-      images: data.images ?? undefined,
+      description: data.description ?? "",
+      images: data.images ?? "",
     });
+  };
+
+  const onDrop = async (acceptedFiles: File[]) => {
+    if (acceptedFiles?.length) {
+      const file = acceptedFiles[0];
+      if (!file) return;
+
+      setIsUploading(true);
+      try {
+        const formData = new FormData();
+        formData.append("file", file);
+
+        const response = await fetch("/api/upload", {
+          method: "POST",
+          body: formData,
+        });
+
+        if (!response.ok) {
+          const errorData = (await response.json()) as { error?: string };
+          throw new Error(
+            errorData.error ?? `Upload failed with status ${response.status}`,
+          );
+        }
+
+        const data = (await response.json()) as { url: string };
+        console.log("✅ Image uploaded:", data.url);
+        setUploadedUrl(data.url);
+        setValue("images", data.url, {
+          shouldValidate: true,
+          shouldDirty: true,
+        });
+      } catch (error) {
+        console.error("❌ Upload error:", error);
+        const errorMessage =
+          error instanceof Error ? error.message : "Erreur inconnue";
+        alert(`Erreur lors du téléchargement: ${errorMessage}`);
+      } finally {
+        setIsUploading(false);
+      }
+    }
   };
 
   return (
@@ -193,20 +246,87 @@ export default function VendeurSetupWizard() {
                   </p>
                 </div>
 
-                <div className="space-y-4">
-                  <Label htmlFor="images" className="text-base">
-                    <Camera className="mr-2 inline h-4 w-4" />
-                    Lien image (Cloudinary, ImgBB, etc.)
-                  </Label>
-                  <Input
-                    id="images"
-                    placeholder="https://res.cloudinary.com/..."
-                    className="h-12"
-                    {...register("images")}
-                  />
-                  <p className="text-muted-foreground text-xs">
-                    Optionnel • Vous pourrez changer plus tard
-                  </p>
+                <div className="space-y-3">
+                  <Label>Photo du produit *</Label>
+                  <div
+                    className="hover:border-primary/50 cursor-pointer rounded-xl border-2 border-dashed p-10 text-center transition-all"
+                    onClick={(e) => {
+                      if (!uploadedUrl && !isUploading) {
+                        e.currentTarget
+                          .querySelector<HTMLInputElement>('input[type="file"]')
+                          ?.click();
+                      }
+                    }}
+                    onDrop={(e) => {
+                      e.preventDefault();
+                      void onDrop(Array.from(e.dataTransfer.files));
+                    }}
+                    onDragOver={(e) => e.preventDefault()}
+                  >
+                    {uploadedUrl ? (
+                      <div className="space-y-4">
+                        <Image
+                          src={uploadedUrl}
+                          alt="Essenya"
+                          height={250}
+                          width={460}
+                          className="mx-auto max-h-64 rounded-lg shadow-xl"
+                        />
+                        <div className="flex justify-center gap-2">
+                          <Badge variant="default" className="gap-1">
+                            <Check className="h-3 w-3" />
+                            Prête
+                          </Badge>
+                          <Button
+                            type="button"
+                            variant="ghost"
+                            size="sm"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              setUploadedUrl("");
+                              setValue("images", "");
+                            }}
+                          >
+                            Changer
+                          </Button>
+                        </div>
+                      </div>
+                    ) : isUploading ? (
+                      <div className="space-y-4">
+                        <Loader2 className="text-primary mx-auto h-12 w-12 animate-spin" />
+                        <p className="text-sm">Upload en cours...</p>
+                      </div>
+                    ) : (
+                      <div className="space-y-4">
+                        <Upload className="text-muted-foreground mx-auto h-14 w-14" />
+                        <p className="text-sm">
+                          Glissez votre image ici ou{" "}
+                          <span className="text-primary underline">
+                            cliquez
+                          </span>
+                        </p>
+                        <Input
+                          type="file"
+                          accept="image/*"
+                          className="hidden"
+                          onChange={(e) => {
+                            if (e.target.files) {
+                              void onDrop(Array.from(e.target.files));
+                            }
+                          }}
+                          onClick={(e) => e.stopPropagation()}
+                        />
+                        <p className="text-muted-foreground text-xs">
+                          Max 4 Mo • JPG, PNG
+                        </p>
+                      </div>
+                    )}
+                  </div>
+                  {errors.images && (
+                    <p className="text-sm text-red-500">
+                      {errors.images.message}
+                    </p>
+                  )}
                 </div>
 
                 <div className="bg-primary/5 border-primary/20 rounded-xl border p-6">

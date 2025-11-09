@@ -145,6 +145,7 @@ export const servicesRouter = createTRPCRouter({
           description: input.description,
           prix: input.prix,
           types: input.types,
+          tags: input.tags,
           imageUrl: input.imageUrl ?? null,
         },
       });

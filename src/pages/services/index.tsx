@@ -1,10 +1,12 @@
 import Head from "next/head";
 import { useState, useMemo } from "react";
+import { PaginationContextProvider } from "~/common/components/pagination/context/pagination.context";
 import Footer from "~/components/blocs/landing/Footer";
 import Navbar from "~/components/blocs/landing/navbar";
 import CategoryFilter from "~/components/blocs/service-marketplace/CategoryFilter";
 import SearchBar from "~/components/blocs/service-marketplace/SearchBar";
 import ServiceCard from "~/components/blocs/service-marketplace/ServiceCard";
+import { ServiceList } from "~/components/blocs/service-marketplace/ServiceList";
 import TagsFilter from "~/components/blocs/service-marketplace/TagsFilter";
 import { Card } from "~/components/ui/card";
 import { MainLayout } from "~/layouts";
@@ -183,13 +185,13 @@ const ServiceMarketplacePage = () => {
                   toggleTag={toggleTag}
                 />
               </Card>
-              <Card className="mb-6 p-6">
-                <div className="mt-6 grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
-                  {filteredServices.map((service) => (
-                    <ServiceCard key={service.id} service={service} />
-                  ))}
-                </div>
-              </Card>
+              <PaginationContextProvider ressourcesName="Type">
+                <ServiceList
+                  searchQuery={searchQuery}
+                  selectedTags={selectedTags}
+                  selectedCategory={selectedCategory}
+                />
+              </PaginationContextProvider>
             </div>
           </div>
         </main>

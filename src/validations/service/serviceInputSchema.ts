@@ -1,20 +1,22 @@
 import { z } from "zod";
 
-export const predefinedTypes = [
-  "Bio",
-  "Local",
-  "Artisanal",
-  "Fait main",
-  "Édition limitée",
-  "Mariage",
-  "Luxe",
-  "Éco-responsable",
-  "Vintage",
+export const predefinedTags = [
+  "Equipment",
+  "Heavy Machinery",
+  "Seasonal Work",
+  "Harvesting",
+  "Livestock",
+  "Emergency Care",
+  "Installation",
+  "Irrigation",
+  "Testing",
+  "Analysis",
 ];
 
 export const serviceInputSchema = z.object({
-  nom: z.string().min(1, "Product name is required"),
-  types: z.array(z.string()),
+  nom: z.string().min(1, "Service name is required"),
+  types: z.string().min(1, "Service type is required"),
+  tags: z.array(z.string()),
   description: z.string().min(1, "Description is required"),
   imageUrl: z
     .string()
@@ -40,6 +42,7 @@ export type serviceInputSchemaType = z.infer<typeof serviceInputSchema>;
 export interface ServiceInputErrors {
   nom: string;
   types: string;
+  tags: string;
   description: string;
   imageUrl: string;
   prix: string;

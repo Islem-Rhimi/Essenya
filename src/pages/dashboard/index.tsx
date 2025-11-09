@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import Carousel from "~/components/blocs/dashboard/Carousel";
 import { ProductList } from "~/components/blocs/dashboard/ProductList";
 import { MainLayout } from "~/layouts";
@@ -13,8 +13,11 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import Statistics from "~/components/blocs/dashboard/Statistics";
 import ProductFilterBar from "~/components/blocs/dashboard/filter/ProductFilterSection";
 import { Calendar } from "lucide-react";
+import { PaginationContextProvider } from "~/common/components/pagination/context/pagination.context";
 
 const Dashboard = () => {
+  const [searchTerm, setSearchTerm] = useState<string>("");
+
   return (
     <MainLayout>
       <div className="space-y-6 p-6">
@@ -84,7 +87,9 @@ const Dashboard = () => {
           </CardHeader>
           <CardContent className="space-y-6">
             {/* Products Grid */}
-            <ProductList />
+            <PaginationContextProvider ressourcesName="Type">
+              <ProductList searchValue={searchTerm} />
+            </PaginationContextProvider>
           </CardContent>
         </Card>
       </div>

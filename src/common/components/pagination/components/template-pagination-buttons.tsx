@@ -35,7 +35,7 @@ export const TemplatePaginationButtons: React.FC<
           title="itemsPerPage"
           value={paginationStates.itemsPerPage}
           onChange={(e) => handlePerPageChange(Number(e.target.value))}
-          className="bg-card-car rounded-lg border-2 border-[rgba(212,175,55,0.3)] px-3 py-2 text-green-500 transition-colors hover:border-green-500 focus:border-green-500 focus:outline-none"
+          className="bg-card-car rounded-lg border-2 border-green-400 px-3 py-2 text-green-500 transition-colors hover:border-green-500 focus:border-green-500 focus:outline-none"
         >
           {perPageOptions.map((option) => (
             <option

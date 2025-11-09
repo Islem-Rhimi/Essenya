@@ -21,11 +21,18 @@ import { api } from "~/utils/api";
 import Image from "next/image";
 import type { Services } from "@prisma/client";
 import { toast } from "sonner";
-import { predefinedTypes } from "~/validations/service/serviceInputSchema";
+import { predefinedTags } from "~/validations/service/serviceInputSchema";
 import {
   serviceUpdateSchema,
   type serviceUpdateSchemaType,
 } from "~/validations/service/serviceUpdateSchema";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "~/components/ui/select";
 
 interface EditServiceModalProps {
   open: boolean;
@@ -57,6 +64,7 @@ export function EditServiceModal({
       id: service.id,
       nom: service.nom,
       types: service.types,
+      tags: service.tags,
       description: service.description,
       prix: service.prix,
       imageUrl: service.imageUrl ?? "",
@@ -65,7 +73,7 @@ export function EditServiceModal({
 
   const updateMutation = api.services.update.useMutation({
     onSuccess: async () => {
-      toast.success("Voiture modifiée avec succès!");
+      toast.success("Service modifié avec succès!");
       await utils.services.getMyServices.invalidate();
       onOpenChange(false);
     },
@@ -74,7 +82,9 @@ export function EditServiceModal({
     },
   });
 
-  const types = watch("types") || [];
+  const selectedType = watch("types");
+  const tags = watch("tags") || [];
+
   useEffect(() => {
     if (!service) return;
 
@@ -82,6 +92,7 @@ export function EditServiceModal({
       id: service.id,
       nom: service.nom,
       types: service.types,
+      tags: service.tags,
       description: service.description,
       prix: service.prix,
       imageUrl: service.imageUrl ?? "",
@@ -115,18 +126,6 @@ export function EditServiceModal({
   const onSubmit: SubmitHandler<serviceUpdateSchemaType> = async (data) => {
     await updateMutation.mutateAsync(data);
   };
-
-  // if (isLoading) {
-  //   return (
-  //     <Dialog open={open} onOpenChange={onOpenChange}>
-  //       <DialogContent>
-  //         <div className="py-10 text-center">
-  //           <Loader2 className="mx-auto h-8 w-8 animate-spin" />
-  //         </div>
-  //       </DialogContent>
-  //     </Dialog>
-  //   );
-  // }
 
   return (
     <Dialog
@@ -223,7 +222,7 @@ export function EditServiceModal({
             </div>
           </div>
 
-          {/* FORM FIELDS - SAME AS ADD */}
+          {/* FORM FIELDS */}
           <div className="grid gap-6 md:grid-cols-2">
             <div className="space-y-2">
               <Label>Nom *</Label>
@@ -237,30 +236,59 @@ export function EditServiceModal({
           <div className="space-y-2">
             <Label>Description *</Label>
             <Textarea {...register("description")} rows={4} />
+            {errors.description && (
+              <p className="text-sm text-red-500">
+                {errors.description.message}
+              </p>
+            )}
           </div>
 
           <div className="grid gap-6 md:grid-cols-3">
             <div className="space-y-2">
               <Label>Prix (dt) *</Label>
               <Input {...register("prix")} />
+              {errors.prix && (
+                <p className="text-sm text-red-500">{errors.prix.message}</p>
+              )}
             </div>
           </div>
 
+          {/* CATEGORY SELECT */}
+          <div className="space-y-2">
+            <Label>Catégorie *</Label>
+            <Select
+              value={selectedType}
+              onValueChange={(value) => setValue("types", value)}
+            >
+              <SelectTrigger className="w-full sm:w-auto">
+                <SelectValue placeholder="Sélectionner une catégorie" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="All Services">All Services</SelectItem>
+                <SelectItem value="Machines">Machines</SelectItem>
+                <SelectItem value="Labor">Labor</SelectItem>
+                <SelectItem value="Veterinary">Veterinary</SelectItem>
+              </SelectContent>
+            </Select>
+            {errors.types && (
+              <p className="text-sm text-red-500">{errors.types.message}</p>
+            )}
+          </div>
+
+          {/* TAGS */}
           <div className="space-y-4">
             <Label>Étiquettes</Label>
             <div className="flex flex-wrap gap-2">
-              {types.map((t) => (
-                <Badge key={t} variant="secondary" className="gap-1">
+              {tags.map((t) => (
+                <Badge key={t} variant="secondary" className="gap-1 px-3 py-1">
                   {t}
                   <Button
                     type="button"
-                    size="icon"
-                    variant="ghost"
-                    className="h-4 w-4"
+                    className="hover:bg-destructive/20 ml-1 rounded-full"
                     onClick={() =>
                       setValue(
-                        "types",
-                        types.filter((x) => x !== t),
+                        "tags",
+                        tags.filter((x) => x !== t),
                       )
                     }
                   >
@@ -275,23 +303,23 @@ export function EditServiceModal({
                 if (e.key === "Enter") {
                   e.preventDefault();
                   const val = e.currentTarget.value.trim();
-                  if (val && !types.includes(val)) {
-                    setValue("types", [...types, val]);
+                  if (val && !tags.includes(val)) {
+                    setValue("tags", [...tags, val]);
                     e.currentTarget.value = "";
                   }
                 }
               }}
             />
             <div className="flex flex-wrap gap-2">
-              {predefinedTypes
-                .filter((t) => !types.includes(t))
+              {predefinedTags
+                .filter((t) => !tags.includes(t))
                 .map((t) => (
                   <Button
                     key={t}
                     type="button"
                     variant="outline"
                     size="sm"
-                    onClick={() => setValue("types", [...types, t])}
+                    onClick={() => setValue("tags", [...tags, t])}
                   >
                     + {t}
                   </Button>

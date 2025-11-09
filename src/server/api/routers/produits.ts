@@ -1,6 +1,6 @@
 import { z } from "zod";
 import { TRPCError } from "@trpc/server";
-import { createTRPCRouter, protectedProcedure } from "../trpc";
+import { createTRPCRouter, protectedProcedure, publicProcedure } from "../trpc";
 import { productUpdateSchema } from "~/validations/product/productUpdateSchema";
 import { productInputSchema } from "~/validations/product/productInputSchema";
 import type { Prisma } from "@prisma/client";
@@ -38,6 +38,56 @@ const buildPaginationMeta = (total: number, page: number, pageSize: number) => {
 };
 
 export const produitsRouter = createTRPCRouter({
+  getProducts: publicProcedure
+    .input(
+      z.object({
+        page: z.number().min(1).default(1),
+        pageSize: z.number().min(1).max(50).default(12),
+        search: z.string().optional(),
+        nom: z.string().optional(),
+        categorie: z.string().optional(),
+      }),
+    )
+    .query(async ({ ctx, input }) => {
+      const { page, pageSize, search, categorie } = input;
+      const skip = (page - 1) * pageSize;
+
+      // Build search
+      const where: Prisma.ProduitsWhereInput = {
+        ...(search && {
+          OR: [
+            { nom: { contains: search, mode: "insensitive" } },
+            { description: { contains: search, mode: "insensitive" } },
+            { categorie: { contains: search, mode: "insensitive" } },
+          ],
+        }),
+        ...(categorie && { categorie }),
+      };
+
+      const [total, produits] = await Promise.all([
+        ctx.db.produits.count({ where }),
+        ctx.db.produits.findMany({
+          where,
+          skip,
+          take: pageSize,
+          orderBy: { createdAt: "desc" },
+          select: {
+            id: true,
+            nom: true,
+            prix: true,
+            unite: true,
+            categorie: true,
+            imageUrl: true,
+            createdAt: true,
+          },
+        }),
+      ]);
+
+      return {
+        data: produits,
+        meta: buildPaginationMeta(total, page, pageSize),
+      };
+    }),
   myList: protectedProcedure
     .input(
       z.object({

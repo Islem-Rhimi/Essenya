@@ -43,13 +43,18 @@ export function ServiceTableRow({ service }: ServiceTableRowProps) {
           <span className="ml-1 font-normal text-gray-500">/ par heure</span>
         </div>
       </TableCell>
+      <TableCell>
+        <div className="font-medium text-gray-900 dark:text-amber-100">
+          {service.types}
+        </div>
+      </TableCell>
 
       {/* Tags */}
       <TableCell>
         <div className="flex flex-wrap gap-1">
-          {service.types.map((type) => (
-            <Badge key={type} variant="secondary" className="text-xs">
-              {type}
+          {service.tags.map((tag) => (
+            <Badge key={tag} variant="secondary" className="text-xs">
+              {tag}
             </Badge>
           ))}
         </div>

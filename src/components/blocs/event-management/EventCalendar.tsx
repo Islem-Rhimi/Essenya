@@ -1,37 +1,63 @@
 "use client";
 
 import React, { useState, useMemo } from "react";
-import { ChevronLeft, ChevronRight, Plus, X, Trash2 } from "lucide-react";
+import {
+  ChevronLeft,
+  ChevronRight,
+  Plus,
+  X,
+  Trash2,
+  Check,
+  Loader2,
+  Upload,
+} from "lucide-react";
 import { api } from "~/utils/api";
 import type { Evenement } from "@prisma/client";
 import { Button } from "~/components/ui/button";
 import { Input } from "~/components/ui/input";
 import { toast } from "sonner";
+import { useForm, type SubmitHandler } from "react-hook-form";
+import {
+  eventInputSchema,
+  type eventInputSchemaType,
+} from "~/validations/events/eventInputSchema";
+import { zodResolver } from "@hookform/resolvers/zod";
+import Image from "next/image";
+import { Badge } from "~/components/ui/badge";
+import { Label } from "~/components/ui/label";
 
-type EventFormData = {
-  title: string;
-  date: string;
-  time: string;
-  duration: number;
-  color: string;
-  description: string;
-};
-
-type EventWithId = EventFormData & { id: string };
+// Form type matches schema exactly
+// type EventFormType = eventInputSchemaType; // Not needed anymore
 
 export default function EventCalendar() {
+  const [uploadedUrl, setUploadedUrl] = useState<string>("");
+  const [isUploading, setIsUploading] = useState(false);
   const [currentDate, setCurrentDate] = useState(new Date());
-  const [selectedEvent, setSelectedEvent] = useState<EventWithId | null>(null);
+  const [selectedEventId, setSelectedEventId] = useState<string | null>(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
-  const [formData, setFormData] = useState<EventFormData>({
-    title: "",
-    date: "",
-    time: "09:00",
-    duration: 60,
-    color: "#3b82f6",
-    description: "",
+  const [hoveredDate, setHoveredDate] = useState<string | null>(null);
+
+  const {
+    register,
+    handleSubmit,
+    watch,
+    setValue,
+    reset,
+    formState: { errors, isSubmitting },
+  } = useForm<eventInputSchemaType>({
+    resolver: zodResolver(eventInputSchema),
+    defaultValues: {
+      title: "",
+      localisation: "",
+      description: "",
+      image: "",
+      date: "",
+      time: "09:00",
+      color: "#3b82f6",
+    },
   });
 
+  // API queries and mutations
   const { data, refetch } = api.evenement.getMyEvents.useQuery(undefined, {
     refetchOnWindowFocus: false,
   });
@@ -39,14 +65,22 @@ export default function EventCalendar() {
   const create = api.evenement.create.useMutation({
     onSuccess: async () => {
       await refetch();
+      toast.success("Événement créé !");
       closeDialog();
+    },
+    onError: () => {
+      toast.error("Erreur lors de la création");
     },
   });
 
   const update = api.evenement.update.useMutation({
     onSuccess: async () => {
       await refetch();
+      toast.success("Événement modifié !");
       closeDialog();
+    },
+    onError: () => {
+      toast.error("Erreur lors de la modification");
     },
   });
 
@@ -62,6 +96,7 @@ export default function EventCalendar() {
   });
 
   const events: Evenement[] = data?.data ?? [];
+  const formValues = watch();
 
   const months = [
     "Janvier",
@@ -102,7 +137,7 @@ export default function EventCalendar() {
   const getEventsForDate = (date: Date | null): Evenement[] => {
     if (!date) return [];
 
-    const localDateStr = date.toLocaleDateString("fr-CA"); // format yyyy-MM-dd
+    const localDateStr = date.toLocaleDateString("fr-CA");
 
     return events
       .filter((e) => {
@@ -132,82 +167,62 @@ export default function EventCalendar() {
     event: Evenement | null = null,
   ) => {
     if (event) {
+      // Editing existing event
       const eventDate = new Date(event.date);
-      // Use local timezone for display
+
       const year = eventDate.getFullYear();
       const month = String(eventDate.getMonth() + 1).padStart(2, "0");
       const day = String(eventDate.getDate()).padStart(2, "0");
       const dateStr = `${year}-${month}-${day}`;
+
       const hours = String(eventDate.getHours()).padStart(2, "0");
       const minutes = String(eventDate.getMinutes()).padStart(2, "0");
       const timeStr = `${hours}:${minutes}`;
 
-      setSelectedEvent({
-        id: event.id,
+      setSelectedEventId(event.id);
+
+      // Reset form with event values
+      reset({
         title: event.title,
+        localisation: event.localisation,
         date: dateStr,
         time: timeStr,
-        duration: 60,
-        color: event.color,
+        color: event.color ?? "#3b82f6",
+        image: event.image ?? "",
         description: event.description ?? "",
       });
-      setFormData({
-        title: event.title,
-        date: dateStr,
-        time: timeStr,
-        duration: 60,
-        color: event.color,
-        description: event.description ?? "",
-      });
+
+      setUploadedUrl(event.image ?? "");
     } else {
-      setSelectedEvent(null);
+      // Creating new event
+      setSelectedEventId(null);
       const targetDate = date ?? new Date();
       const year = targetDate.getFullYear();
       const month = String(targetDate.getMonth() + 1).padStart(2, "0");
       const day = String(targetDate.getDate()).padStart(2, "0");
       const dateStr = `${year}-${month}-${day}`;
 
-      setFormData({
+      // Reset form with default values
+      reset({
         title: "",
+        localisation: "",
         date: dateStr,
         time: "09:00",
-        duration: 60,
         color: "#3b82f6",
+        image: "",
         description: "",
       });
+
+      setUploadedUrl("");
     }
     setIsDialogOpen(true);
   };
 
   const closeDialog = () => {
     setIsDialogOpen(false);
-    setSelectedEvent(null);
-  };
-
-  const handleSubmit = () => {
-    if (!formData.title || !formData.date) return;
-
-    // Create date in local timezone, then convert to ISO string
-    const dateTime = new Date(
-      `${formData.date}T${formData.time}:00`,
-    ).toISOString();
-
-    if (selectedEvent) {
-      update.mutate({
-        id: selectedEvent.id,
-        title: formData.title,
-        date: dateTime,
-        color: formData.color,
-        description: formData.description || undefined,
-      });
-    } else {
-      create.mutate({
-        title: formData.title,
-        date: dateTime,
-        color: formData.color,
-        description: formData.description || undefined,
-      });
-    }
+    setSelectedEventId(null);
+    setUploadedUrl("");
+    reset();
   };
 
   const isToday = (date: Date | null): boolean => {
@@ -221,6 +236,71 @@ export default function EventCalendar() {
       hour: "2-digit",
       minute: "2-digit",
     });
+  };
+
+  const onDrop = async (acceptedFiles: File[]) => {
+    if (acceptedFiles?.length) {
+      const file = acceptedFiles[0];
+      if (!file) return;
+
+      setIsUploading(true);
+      try {
+        const formData = new FormData();
+        formData.append("file", file);
+
+        const response = await fetch("/api/upload", {
+          method: "POST",
+          body: formData,
+        });
+
+        if (!response.ok) {
+          const errorData = (await response.json()) as { error?: string };
+          throw new Error(
+            errorData.error ?? `Upload failed with status ${response.status}`,
+          );
+        }
+
+        const data = (await response.json()) as { url: string };
+        console.log("✅ Image uploaded:", data.url);
+        setUploadedUrl(data.url);
+        setValue("image", data.url, {
+          shouldValidate: true,
+          shouldDirty: true,
+        });
+      } catch (error) {
+        console.error("❌ Upload error:", error);
+        const errorMessage =
+          error instanceof Error ? error.message : "Erreur inconnue";
+        toast.error(`Erreur lors du téléchargement: ${errorMessage}`);
+      } finally {
+        setIsUploading(false);
+      }
+    }
+  };
+
+  // Form submission handler
+  const onSubmit: SubmitHandler<eventInputSchemaType> = async (formData) => {
+    // Prepare mutation data - send both date and time as strings
+    const mutationData = {
+      title: formData.title,
+      localisation: formData.localisation,
+      date: formData.date,
+      time: formData.time,
+      color: formData.color || "#3b82f6",
+      image: formData.image || undefined,
+      description: formData.description || undefined,
+    };
+
+    if (selectedEventId) {
+      // Update existing event
+      update.mutate({
+        id: selectedEventId,
+        ...mutationData,
+      });
+    } else {
+      // Create new event
+      create.mutate(mutationData);
+    }
   };
 
   return (
@@ -280,16 +360,20 @@ export default function EventCalendar() {
           {days.map((date, index) => {
             const dayEvents = getEventsForDate(date);
             const isCurrentDay = isToday(date);
+            const dateKey = date?.toISOString() || `empty-${index}`;
+            const isHovered = hoveredDate === dateKey;
 
             return (
               <div
                 key={index}
-                className={`min-h-32 border-r border-b border-gray-200 p-2 ${
+                className={`relative min-h-32 border-r border-b border-gray-200 p-2 ${
                   !date
                     ? "bg-gray-50"
                     : "cursor-pointer bg-white hover:bg-gray-50"
                 } ${index % 7 === 0 ? "border-l-0" : ""}`}
                 onClick={() => date && openDialog(date)}
+                onMouseEnter={() => date && setHoveredDate(dateKey)}
+                onMouseLeave={() => setHoveredDate(null)}
               >
                 {date && (
                   <>
@@ -303,30 +387,71 @@ export default function EventCalendar() {
                       {date.getDate()}
                     </div>
                     <div className="space-y-1">
-                      {dayEvents.slice(0, 3).map((event) => (
-                        <div
-                          key={event.id}
-                          className="cursor-pointer truncate rounded p-1.5 text-xs text-white hover:opacity-80"
-                          style={{ backgroundColor: event.color ?? "#D4AF37" }}
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            openDialog(null, event);
-                          }}
-                        >
-                          <div className="truncate font-medium">
-                            {event.title}
+                      {/* Show first 3 events when not hovering */}
+                      {!isHovered &&
+                        dayEvents.slice(0, 3).map((event) => (
+                          <div
+                            key={event.id}
+                            className="cursor-pointer truncate rounded p-1.5 text-xs text-white hover:opacity-80"
+                            style={{
+                              backgroundColor: event.color ?? "#D4AF37",
+                            }}
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              openDialog(null, event);
+                            }}
+                          >
+                            <div className="truncate font-medium">
+                              {event.title}
+                            </div>
+                            <div className="text-xs opacity-90">
+                              {formatTime(new Date(event.date))}
+                            </div>
                           </div>
-                          <div className="text-xs opacity-90">
-                            {formatTime(new Date(event.date))}
-                          </div>
-                        </div>
-                      ))}
-                      {dayEvents.length > 3 && (
+                        ))}
+                      {!isHovered && dayEvents.length > 3 && (
                         <div className="pl-1.5 text-xs font-medium text-gray-600">
                           +{dayEvents.length - 3} plus
                         </div>
                       )}
                     </div>
+
+                    {/* Hover popup to show all events */}
+                    {isHovered && dayEvents.length > 3 && (
+                      <div className="absolute top-0 left-0 z-50 w-64 rounded-lg border border-gray-300 bg-white p-3 shadow-xl">
+                        <div className="mb-2 font-semibold text-gray-700">
+                          {date.toLocaleDateString("fr-FR", {
+                            day: "numeric",
+                            month: "long",
+                          })}
+                        </div>
+                        <div className="max-h-96 space-y-2 overflow-y-auto">
+                          {dayEvents.map((event) => (
+                            <div
+                              key={event.id}
+                              className="cursor-pointer rounded p-2 text-xs text-white hover:opacity-80"
+                              style={{
+                                backgroundColor: event.color ?? "#D4AF37",
+                              }}
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                openDialog(null, event);
+                              }}
+                            >
+                              <div className="font-medium">{event.title}</div>
+                              <div className="opacity-90">
+                                {formatTime(new Date(event.date))}
+                              </div>
+                              {event.localisation && (
+                                <div className="mt-1 opacity-80">
+                                  📍 {event.localisation}
+                                </div>
+                              )}
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
                   </>
                 )}
               </div>
@@ -341,9 +466,10 @@ export default function EventCalendar() {
           <div className="w-full max-w-md rounded-lg bg-white shadow-xl">
             <div className="flex items-center justify-between border-b p-6">
               <h3 className="text-xl font-semibold">
-                {selectedEvent ? "Modifier l'événement" : "Nouvel événement"}
+                {selectedEventId ? "Modifier l'événement" : "Nouvel événement"}
               </h3>
               <Button
+                type="button"
                 onClick={closeDialog}
                 className="rounded p-1 hover:bg-gray-100"
               >
@@ -352,68 +478,173 @@ export default function EventCalendar() {
             </div>
 
             <div className="space-y-4 p-6">
+              {/* IMAGE UPLOAD */}
+              <div className="space-y-3">
+                <Label>Photo de l'événement</Label>
+                <div
+                  className="hover:border-primary/50 cursor-pointer rounded-xl border-2 border-dashed p-10 text-center transition-all"
+                  onClick={(e) => {
+                    if (!uploadedUrl && !isUploading) {
+                      e.currentTarget
+                        .querySelector<HTMLInputElement>('input[type="file"]')
+                        ?.click();
+                    }
+                  }}
+                  onDrop={(e) => {
+                    e.preventDefault();
+                    void onDrop(Array.from(e.dataTransfer.files));
+                  }}
+                  onDragOver={(e) => e.preventDefault()}
+                >
+                  {uploadedUrl ? (
+                    <div className="space-y-4">
+                      <Image
+                        src={uploadedUrl}
+                        alt="événement"
+                        height={200}
+                        width={460}
+                        className="mx-auto max-h-64 rounded-lg shadow-xl"
+                      />
+                      <div className="flex justify-center gap-2">
+                        <Badge variant="default" className="gap-1">
+                          <Check className="h-3 w-3" />
+                          Prête
+                        </Badge>
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          size="sm"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setUploadedUrl("");
+                            setValue("image", "");
+                          }}
+                        >
+                          Changer
+                        </Button>
+                      </div>
+                    </div>
+                  ) : isUploading ? (
+                    <div className="space-y-4">
+                      <Loader2 className="text-primary mx-auto h-12 w-12 animate-spin" />
+                      <p className="text-sm">Upload en cours...</p>
+                    </div>
+                  ) : (
+                    <div className="space-y-4">
+                      <Upload className="text-muted-foreground mx-auto h-14 w-14" />
+                      <p className="text-sm">
+                        Glissez votre image ici ou{" "}
+                        <span className="text-primary underline">cliquez</span>
+                      </p>
+                      <Input
+                        type="file"
+                        accept="image/*"
+                        className="hidden"
+                        onChange={(e) => {
+                          if (e.target.files) {
+                            void onDrop(Array.from(e.target.files));
+                          }
+                        }}
+                        onClick={(e) => e.stopPropagation()}
+                      />
+                      <p className="text-muted-foreground text-xs">
+                        Max 4 Mo • JPG, PNG
+                      </p>
+                    </div>
+                  )}
+                </div>
+                {errors.image && (
+                  <p className="text-sm text-red-500">{errors.image.message}</p>
+                )}
+              </div>
+
+              {/* TITLE */}
               <div>
                 <label className="mb-1 block text-sm font-medium text-gray-700">
-                  Titre
+                  Titre *
                 </label>
                 <input
+                  {...register("title")}
                   type="text"
-                  value={formData.title}
-                  onChange={(e) =>
-                    setFormData({ ...formData, title: e.target.value })
-                  }
                   className="w-full rounded-lg border border-gray-300 px-3 py-2 focus:border-transparent focus:ring-2 focus:ring-green-500"
                   placeholder="Nom de l'événement"
                 />
+                {errors.title && (
+                  <p className="mt-1 text-sm text-red-500">
+                    {errors.title.message}
+                  </p>
+                )}
               </div>
 
+              {/* LOCALISATION */}
+              <div>
+                <label className="mb-1 block text-sm font-medium text-gray-700">
+                  Localisation *
+                </label>
+                <input
+                  {...register("localisation")}
+                  type="text"
+                  className="w-full rounded-lg border border-gray-300 px-3 py-2 focus:border-transparent focus:ring-2 focus:ring-green-500"
+                  placeholder="Lieu de l'événement"
+                />
+                {errors.localisation && (
+                  <p className="mt-1 text-sm text-red-500">
+                    {errors.localisation.message}
+                  </p>
+                )}
+              </div>
+
+              {/* DATE & TIME */}
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <label className="mb-1 block text-sm font-medium text-gray-700">
-                    Date
+                    Date *
                   </label>
                   <Input
+                    {...register("date")}
                     type="date"
-                    value={formData.date}
-                    onChange={(e) =>
-                      setFormData({ ...formData, date: e.target.value })
-                    }
                     className="w-full rounded-lg border border-gray-300 px-3 py-2 focus:border-transparent focus:ring-2 focus:ring-green-500"
                   />
+                  {errors.date && (
+                    <p className="mt-1 text-sm text-red-500">
+                      {errors.date.message}
+                    </p>
+                  )}
                 </div>
                 <div>
                   <label className="mb-1 block text-sm font-medium text-gray-700">
-                    Heure
+                    Heure *
                   </label>
                   <Input
+                    {...register("time")}
                     type="time"
-                    value={formData.time}
-                    onChange={(e) =>
-                      setFormData({ ...formData, time: e.target.value })
-                    }
                     className="w-full rounded-lg border border-gray-300 px-3 py-2 focus:border-transparent focus:ring-2 focus:ring-green-500"
                   />
                 </div>
               </div>
 
+              {/* DESCRIPTION */}
               <div>
                 <label className="mb-1 block text-sm font-medium text-gray-700">
                   Description
                 </label>
                 <textarea
-                  value={formData.description}
-                  onChange={(e) =>
-                    setFormData({ ...formData, description: e.target.value })
-                  }
+                  {...register("description")}
                   className="w-full rounded-lg border border-gray-300 px-3 py-2 focus:border-transparent focus:ring-2 focus:ring-green-500"
                   rows={3}
                   placeholder="Détails de l'événement"
                 />
+                {errors.description && (
+                  <p className="mt-1 text-sm text-red-500">
+                    {errors.description.message}
+                  </p>
+                )}
               </div>
 
+              {/* COLOR PICKER */}
               <div>
                 <label className="mb-1 block text-sm font-medium text-gray-700">
-                  Couleur
+                  Couleur *
                 </label>
                 <div className="flex gap-2">
                   {[
@@ -428,18 +659,32 @@ export default function EventCalendar() {
                     <Button
                       key={color}
                       type="button"
-                      onClick={() => setFormData({ ...formData, color })}
-                      className={`h-8 w-8 rounded-full ${formData.color === color ? "ring-2 ring-gray-400 ring-offset-2" : ""}`}
+                      onClick={() =>
+                        setValue("color", color, { shouldValidate: true })
+                      }
+                      className={`h-8 w-8 rounded-full transition-all ${
+                        formValues.color === color
+                          ? "ring-2 ring-gray-400 ring-offset-2"
+                          : ""
+                      }`}
                       style={{ backgroundColor: color }}
                     />
                   ))}
                 </div>
+                {errors.color && (
+                  <p className="mt-1 text-sm text-red-500">
+                    {errors.color.message}
+                  </p>
+                )}
               </div>
 
+              {/* ACTION BUTTONS */}
               <div className="flex justify-between pt-4">
-                {selectedEvent && (
+                {selectedEventId && (
                   <Button
-                    onClick={() => deleteEvent.mutate({ id: selectedEvent.id })}
+                    type="button"
+                    onClick={() => deleteEvent.mutate({ id: selectedEventId })}
+                    disabled={deleteEvent.isPending}
                     className="flex items-center gap-2 rounded-lg bg-red-50 px-4 py-2 text-red-600 hover:bg-red-100 disabled:opacity-50"
                   >
                     <Trash2 className="h-4 w-4" />
@@ -448,17 +693,25 @@ export default function EventCalendar() {
                 )}
                 <div className="ml-auto flex gap-2">
                   <Button
+                    type="button"
                     onClick={closeDialog}
                     className="rounded-lg border border-gray-300 px-4 py-2 hover:bg-gray-50"
                   >
                     Annuler
                   </Button>
                   <button
-                    onClick={handleSubmit}
-                    disabled={create.isPending || update.isPending}
+                    type="button"
+                    onClick={handleSubmit(onSubmit)}
+                    disabled={
+                      isSubmitting || create.isPending || update.isPending
+                    }
                     className="rounded-lg bg-green-600 px-4 py-2 text-white hover:bg-green-700 disabled:opacity-50"
                   >
-                    {selectedEvent ? "Sauvegarder" : "Créer"}
+                    {isSubmitting || create.isPending || update.isPending
+                      ? "En cours..."
+                      : selectedEventId
+                        ? "Sauvegarder"
+                        : "Créer"}
                   </button>
                 </div>
               </div>
