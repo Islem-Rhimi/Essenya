@@ -8,17 +8,28 @@ import { TemplatePagination } from "~/common/components/pagination/components/te
 
 interface ProductListProps {
   searchValue: string;
+  tags: string[];
+  priceMin: number;
+  priceMax: number;
 }
 
-export const ProductList: React.FC<ProductListProps> = ({ searchValue }) => {
+export const ProductList: React.FC<ProductListProps> = ({
+  searchValue,
+  tags,
+  priceMin,
+  priceMax,
+}) => {
   const { status } = useSession();
   const { paginationStates, paginationSetStates } = usePagination();
 
-  const { data, isLoading, error } = api.produits.getMyProducts.useQuery(
+  const { data, isLoading, error } = api.produits.getProducts.useQuery(
     {
       page: paginationStates.currentPage,
       pageSize: paginationStates.itemsPerPage,
       search: searchValue,
+      tags: tags.length > 0 ? tags : undefined,
+      priceMin: priceMin > 0 ? priceMin : undefined,
+      priceMax: priceMax < 100 ? priceMax : undefined,
     },
     {
       enabled: status === "authenticated",
@@ -26,28 +37,28 @@ export const ProductList: React.FC<ProductListProps> = ({ searchValue }) => {
     },
   );
 
-  // Reset to page 1 on search
+  // Reset to page 1 when filters change
   React.useEffect(() => {
-    if (searchValue) {
-      paginationSetStates.setCurrentPage(1);
-    }
-  }, [searchValue, paginationSetStates]);
+    paginationSetStates.setCurrentPage(1);
+  }, [searchValue, tags, priceMin, priceMax, paginationSetStates]);
 
-  if (status === "loading") return <div>Loading session…</div>;
+  if (status === "loading") return <div>Chargement de la session...</div>;
   if (status === "unauthenticated")
-    return <div>Please sign in to view your products</div>;
+    return <div>Veuillez vous connecter pour voir vos produits</div>;
 
   if (isLoading)
     return (
-      <Card className="p-8 text-center">
-        <p className="text-[var(--accent-gold)]">Loading products…</p>
+      <Card>
+        <div className="flex items-center justify-center p-8">
+          <div>Chargement des produits...</div>
+        </div>
       </Card>
     );
 
   if (error)
     return (
-      <Card className="p-8 text-center text-red-500">
-        Error: {error.message}
+      <Card>
+        <div className="p-4 text-red-500">Erreur : {error.message}</div>
       </Card>
     );
 
@@ -55,19 +66,23 @@ export const ProductList: React.FC<ProductListProps> = ({ searchValue }) => {
   const meta = data?.meta;
 
   return (
-    <section className="backdrop- rounded-2xl">
+    <div>
       {products.length > 0 ? (
-        <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-3">
-          {products.map((product, index) => (
-            <ProductCard key={index} product={product} />
-          ))}
+        <div>
+          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+            {products.map((product, index) => (
+              <ProductCard key={index} product={product} />
+            ))}
+          </div>
         </div>
       ) : (
-        <div className="text-muted-foreground p-4 text-center">
-          No products found. Adjust your filters.
-        </div>
+        <Card>
+          <div className="text-muted-foreground flex items-center justify-center p-8">
+            No products found. Adjust your filters.
+          </div>
+        </Card>
       )}
       {meta && <TemplatePagination meta={meta} />}
-    </section>
+    </div>
   );
 };

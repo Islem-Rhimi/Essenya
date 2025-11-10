@@ -10,23 +10,37 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 
-const predefinedOptions = ["Fruits", "Vegetables", "Dairy", "Organic", "Local"];
+const predefinedOptions = [
+  "Fruits",
+  "Légumes",
+  "Produits Laitiers",
+  "Bio",
+  "Local",
+];
 
 interface ProductFilterBarProps {
-  onFilter: (filters: any) => void;
+  onFilter: (filters: unknown) => void;
+  setSearchTerm: React.Dispatch<React.SetStateAction<string>>;
+  setTags: React.Dispatch<React.SetStateAction<string[]>>;
+  setPriceRange: React.Dispatch<React.SetStateAction<[number, number]>>;
+  priceRange: [number, number];
+  tags: string[];
 }
 
-export default function ProductFilterBar({ onFilter }: ProductFilterBarProps) {
-  const [tags, setTags] = useState<string[]>([]);
-  const [priceRange, setPriceRange] = useState<[number, number]>([0, 100]);
-  const [inputValue, setInputValue] = useState("");
+export default function ProductFilterBar({
+  onFilter,
+  setSearchTerm,
+  setTags,
+  tags,
+  setPriceRange,
+  priceRange,
+}: ProductFilterBarProps) {
   const [dropdownOpen, setDropdownOpen] = useState(false);
 
   const addTag = (tag: string) => {
     if (!tags.includes(tag)) {
       setTags([...tags, tag]);
     }
-    setInputValue("");
     setDropdownOpen(false);
   };
 
@@ -43,7 +57,7 @@ export default function ProductFilterBar({ onFilter }: ProductFilterBarProps) {
       {/* Tags Filter */}
       <div className="flex items-center gap-2">
         <span className="text-muted-foreground text-sm font-medium">
-          Filters:
+          Filtres :
         </span>
         <div className="flex flex-wrap items-center gap-2">
           {tags.map((tag) => (
@@ -67,26 +81,19 @@ export default function ProductFilterBar({ onFilter }: ProductFilterBarProps) {
       <Popover open={dropdownOpen} onOpenChange={setDropdownOpen}>
         <PopoverTrigger asChild>
           <Button variant="outline" size="default">
-            Add Filter <ChevronDown className="h-4 w-4" />
+            Ajouter un Filtre <ChevronDown className="h-4 w-4" />
           </Button>
         </PopoverTrigger>
         <PopoverContent className="w-64" align="start">
           <div className="space-y-3">
             <div>
               <Input
-                placeholder="Search or add tag"
-                value={inputValue}
-                onChange={(e) => setInputValue(e.target.value)}
-                onKeyDown={(e) => {
-                  if (e.key === "Enter" && inputValue.trim()) {
-                    e.preventDefault();
-                    addTag(inputValue.trim());
-                  }
-                }}
+                placeholder="Rechercher ou ajouter un tag"
+                onChange={(e) => setSearchTerm(e.target.value)}
               />
             </div>
             <div className="space-y-2">
-              <p className="text-sm font-medium">Quick Select:</p>
+              <p className="text-sm font-medium">Sélection Rapide :</p>
               <div className="flex flex-wrap gap-2">
                 {predefinedOptions
                   .filter((option) => !tags.includes(option))
@@ -110,15 +117,15 @@ export default function ProductFilterBar({ onFilter }: ProductFilterBarProps) {
       <Popover>
         <PopoverTrigger asChild>
           <Button variant="outline" size="default">
-            Price: ${priceRange[0]} - ${priceRange[1]}
+            Prix : {priceRange[0]}dt - {priceRange[1]}dt
           </Button>
         </PopoverTrigger>
         <PopoverContent className="w-80" align="start">
           <div className="space-y-4">
             <div>
-              <p className="mb-2 text-sm font-medium">Price Range</p>
+              <p className="mb-2 text-sm font-medium">Fourchette de Prix</p>
               <p className="text-muted-foreground mb-3 text-sm">
-                ${priceRange[0]} - ${priceRange[1]}
+                {priceRange[0]}dt - {priceRange[1]}dt
               </p>
               <Slider
                 min={0}
@@ -137,7 +144,7 @@ export default function ProductFilterBar({ onFilter }: ProductFilterBarProps) {
       {/* Apply Filters Button */}
       {(tags.length > 0 || priceRange[0] > 0 || priceRange[1] < 100) && (
         <Button onClick={handleApplyFilters} size="default">
-          Apply Filters
+          Appliquer les Filtres
         </Button>
       )}
 
@@ -152,7 +159,7 @@ export default function ProductFilterBar({ onFilter }: ProductFilterBarProps) {
             onFilter({ tags: [], priceMin: 0, priceMax: 100 });
           }}
         >
-          Clear All
+          Effacer Tout
         </Button>
       )}
     </div>

@@ -10,7 +10,6 @@ import {
   LogOut,
   PackageCheck,
   AlignLeft,
-  Truck,
   CalendarDays,
   X,
   HandPlatter,
@@ -27,32 +26,6 @@ interface NavItem {
   icon: React.ComponentType<{ className?: string }>;
 }
 type Role = "ADMIN" | "VENDEUR" | "CLIENT" | null;
-const navItems = [
-  { name: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
-  { name: "Services", href: "/farm-service", icon: HandPlatter },
-  { name: "Tourism", href: "/tourism", icon: Plane },
-  {
-    name: "Event",
-    href: "/event",
-    icon: CalendarDays,
-  },
-  {
-    name: "Product Management",
-    href: "/product-management",
-    icon: PackageCheck,
-  },
-  {
-    name: "Event Management",
-    href: "/event-management",
-    icon: CalendarCheck,
-  },
-  {
-    name: "Service Management",
-    href: "/service-management",
-    icon: Wrench,
-  },
-  { name: "Profile", href: "/profile", icon: User },
-];
 
 const MENU_BY_ROLE: Record<NonNullable<Role>, NavItem[]> = {
   ADMIN: [

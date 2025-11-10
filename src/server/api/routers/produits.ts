@@ -46,45 +46,72 @@ export const produitsRouter = createTRPCRouter({
         search: z.string().optional(),
         nom: z.string().optional(),
         categorie: z.string().optional(),
+        tags: z.array(z.string()).optional(),
+        priceMin: z.number().optional(),
+        priceMax: z.number().optional(),
       }),
     )
     .query(async ({ ctx, input }) => {
-      const { page, pageSize, search, categorie } = input;
+      const { page, pageSize, search, categorie, tags, priceMin, priceMax } =
+        input;
       const skip = (page - 1) * pageSize;
 
-      // Build search
-      const where: Prisma.ProduitsWhereInput = {
-        ...(search && {
+      // Build search conditions
+      const whereConditions: Prisma.ProduitsWhereInput[] = [];
+
+      // Text search
+      if (search) {
+        whereConditions.push({
           OR: [
             { nom: { contains: search, mode: "insensitive" } },
             { description: { contains: search, mode: "insensitive" } },
             { categorie: { contains: search, mode: "insensitive" } },
           ],
-        }),
-        ...(categorie && { categorie }),
+        });
+      }
+
+      // Category filter
+      if (categorie) {
+        whereConditions.push({ categorie });
+      }
+
+      // Tags filter (maps to categories)
+      if (tags && tags.length > 0) {
+        whereConditions.push({
+          OR: tags.map((tag) => ({
+            categorie: { contains: tag, mode: "insensitive" },
+          })),
+        });
+      }
+
+      const where: Prisma.ProduitsWhereInput = {
+        AND: whereConditions.length > 0 ? whereConditions : undefined,
       };
 
-      const [total, produits] = await Promise.all([
-        ctx.db.produits.count({ where }),
-        ctx.db.produits.findMany({
-          where,
-          skip,
-          take: pageSize,
-          orderBy: { createdAt: "desc" },
-          select: {
-            id: true,
-            nom: true,
-            prix: true,
-            unite: true,
-            categorie: true,
-            imageUrl: true,
-            createdAt: true,
-          },
-        }),
-      ]);
+      // Get all products matching other filters
+      let produits = await ctx.db.produits.findMany({
+        where,
+        orderBy: { createdAt: "desc" },
+      });
+
+      // Filter by price range in memory (since prix is a string)
+      if (priceMin !== undefined || priceMax !== undefined) {
+        produits = produits.filter((product) => {
+          const price = parseFloat(product.prix || "0");
+          if (isNaN(price)) return false;
+          if (priceMin !== undefined && price < priceMin) return false;
+          if (priceMax !== undefined && price > priceMax) return false;
+          return true;
+        });
+      }
+
+      const total = produits.length;
+
+      // Apply pagination after filtering
+      const paginatedProduits = produits.slice(skip, skip + pageSize);
 
       return {
-        data: produits,
+        data: paginatedProduits,
         meta: buildPaginationMeta(total, page, pageSize),
       };
     }),
@@ -130,15 +157,6 @@ export const produitsRouter = createTRPCRouter({
           skip,
           take: pageSize,
           orderBy: { createdAt: "desc" },
-          select: {
-            id: true,
-            nom: true,
-            prix: true,
-            unite: true,
-            categorie: true,
-            imageUrl: true,
-            createdAt: true,
-          },
         }),
       ]);
 

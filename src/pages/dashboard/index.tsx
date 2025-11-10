@@ -17,6 +17,29 @@ import { PaginationContextProvider } from "~/common/components/pagination/contex
 
 const Dashboard = () => {
   const [searchTerm, setSearchTerm] = useState<string>("");
+  const [tags, setTags] = useState<string[]>([]);
+  const [priceRange, setPriceRange] = useState<[number, number]>([0, 100]);
+
+  // Active filters state - only update when "Apply Filters" is clicked
+  const [activeFilters, setActiveFilters] = useState<{
+    tags: string[];
+    priceMin: number;
+    priceMax: number;
+  }>({
+    tags: [],
+    priceMin: 0,
+    priceMax: 100,
+  });
+
+  const handleApplyFilters = (filters: unknown) => {
+    const typedFilters = filters as {
+      tags: string[];
+      priceMin: number;
+      priceMax: number;
+    };
+    setActiveFilters(typedFilters);
+    console.log("Applied filters:", typedFilters);
+  };
 
   return (
     <MainLayout>
@@ -33,7 +56,7 @@ const Dashboard = () => {
               <CardTitle className="flex items-center">
                 <div className="flex space-x-2">
                   <Calendar className="text-primary" />
-                  <h1 className="text-xl font-semibold">Upcoming Events</h1>
+                  <h1 className="text-xl font-semibold">Événements à venir</h1>
                 </div>
               </CardTitle>
             </div>
@@ -47,21 +70,24 @@ const Dashboard = () => {
         <Card>
           <CardHeader>
             <CardTitle className="text-xl font-semibold">
-              Fresh Products Marketplace
+              Marché des Produits Frais
             </CardTitle>
             <div className="flex flex-col space-y-4 sm:flex-row sm:items-center sm:justify-between sm:space-y-0">
               <div>
                 <p className="text-muted-foreground text-sm">
-                  Showing 12 of 156 products
+                  Affichage des produits
                 </p>
               </div>
               <div className="flex items-center gap-4">
                 <div className="flex gap-2">
                   {/* Horizontal Filter Bar */}
                   <ProductFilterBar
-                    onFilter={(filters) => {
-                      console.log("Applied filters:", filters);
-                    }}
+                    onFilter={handleApplyFilters}
+                    setSearchTerm={setSearchTerm}
+                    tags={tags}
+                    setTags={setTags}
+                    priceRange={priceRange}
+                    setPriceRange={setPriceRange}
                   />
                   <Select defaultValue="relevance">
                     <SelectTrigger className="focus:ring-primary bg-background rounded-md border border-gray-300 px-3 py-2 focus:ring-2 focus:outline-none">
@@ -88,7 +114,12 @@ const Dashboard = () => {
           <CardContent className="space-y-6">
             {/* Products Grid */}
             <PaginationContextProvider ressourcesName="Type">
-              <ProductList searchValue={searchTerm} />
+              <ProductList
+                searchValue={searchTerm}
+                tags={activeFilters.tags}
+                priceMin={activeFilters.priceMin}
+                priceMax={activeFilters.priceMax}
+              />
             </PaginationContextProvider>
           </CardContent>
         </Card>
