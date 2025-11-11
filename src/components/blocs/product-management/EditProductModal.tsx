@@ -77,7 +77,6 @@ export function EditProductModal({
       tags: product.tags,
       statut: product.statut as Statut,
       imageUrl: product.imageUrl ?? "",
-      inventaire: product.inventaire,
     },
   });
 
@@ -108,7 +107,6 @@ export function EditProductModal({
       tags: product.tags,
       statut: product.statut as Statut,
       imageUrl: product.imageUrl ?? "",
-      inventaire: product.inventaire,
     });
 
     setUploadedUrl(product.imageUrl ?? "");
@@ -307,20 +305,6 @@ export function EditProductModal({
                   ))}
                 </SelectContent>
               </Select>
-            </div>
-          </div>
-
-          <div className="grid gap-6 md:grid-cols-2">
-            <div className="space-y-2">
-              <Label>Localisation *</Label>
-              <Input {...register("localisation")} />
-            </div>
-            <div className="space-y-2">
-              <Label>Inventaire *</Label>
-              <Input
-                type="number"
-                {...register("inventaire", { valueAsNumber: true })}
-              />
             </div>
           </div>
 

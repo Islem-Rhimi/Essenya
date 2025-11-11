@@ -39,17 +39,15 @@ export default function PaymentModal({
     formState: { errors },
   } = useForm<CreateCommandeInput>({
     defaultValues: {
-      quantite: "1",
+      quantite: 1,
       adresseLivraison: "",
       notes: "",
     },
   });
 
-  const quantite = watch("quantite") || "1";
+  const quantite = watch("quantite") ?? 1;
 
-  const montantTotal = (
-    parseFloat(product.prix) * parseFloat(quantite)
-  ).toFixed(2);
+  const montantTotal = (parseFloat(product.prix) * quantite).toFixed(2);
 
   // ✅ TRPC mutation
   const createCommande = api.commande.createWithPayment.useMutation({
@@ -105,8 +103,10 @@ export default function PaymentModal({
               {...register("quantite", {
                 required: "La quantité est requise",
                 min: { value: 1, message: "Minimum 1" },
+                valueAsNumber: true, // ✅ critical
               })}
             />
+
             {errors.quantite && (
               <p className="text-sm text-red-500">{errors.quantite.message}</p>
             )}

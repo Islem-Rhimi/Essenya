@@ -192,7 +192,6 @@ export const produitsRouter = createTRPCRouter({
           tags: input.tags,
           statut: input.statut,
           imageUrl: input.imageUrl ?? null,
-          inventaire: input.inventaire,
         },
       });
     }),

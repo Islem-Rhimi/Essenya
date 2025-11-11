@@ -54,6 +54,11 @@ export function ProductTableRow({ product }: ProductTableRowProps) {
           {product.localisation}
         </span>
       </TableCell>
+      <TableCell className="flex-col justify-center">
+        <span className="text-gray-700 dark:text-white">
+          {product.quantite}
+        </span>
+      </TableCell>
 
       {/* Tags */}
       <TableCell>

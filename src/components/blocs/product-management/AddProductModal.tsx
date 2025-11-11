@@ -73,14 +73,13 @@ export function AddProductModal({ open, onOpenChange }: AddProductModalProps) {
       nom: "",
       description: "",
       prix: "",
-      quantite: "10",
+      quantite: 10,
       unite: "par livre",
       localisation: "",
       categorie: "Légumes",
       tags: [],
       statut: "en-stock",
       imageUrl: "",
-      inventaire: 10,
     },
   });
 
@@ -364,19 +363,6 @@ export function AddProductModal({ open, onOpenChange }: AddProductModalProps) {
               {errors.localisation && (
                 <p className="text-sm text-red-500">
                   {errors.localisation.message}
-                </p>
-              )}
-            </div>
-            <div className="space-y-2">
-              <Label>Inventaire *</Label>
-              <Input
-                type="number"
-                {...register("inventaire", { valueAsNumber: true })}
-                placeholder="10"
-              />
-              {errors.inventaire && (
-                <p className="text-sm text-red-500">
-                  {errors.inventaire.message}
                 </p>
               )}
             </div>

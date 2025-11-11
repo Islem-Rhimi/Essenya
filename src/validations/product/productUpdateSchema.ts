@@ -78,7 +78,7 @@ export const productUpdateSchema = z.object({
   nom: z.string().min(1, "Le nom du produit est requis"),
   description: z.string().min(1, "La description est requise"),
   prix: z.string(),
-  quantite: z.string().min(1, "La quantité est requise"),
+  quantite: z.number().min(1, "La quantité est requise"),
   unite: uniteEnum,
   localisation: z.string().min(1, "La localisation est requise"),
   categorie: categorieEnum,
@@ -96,7 +96,6 @@ export const productUpdateSchema = z.object({
     )
     .optional()
     .nullable(),
-  inventaire: z.number().int().min(0, "L’inventaire doit être positif"),
 });
 
 export type productUpdateSchemaType = z.infer<typeof productUpdateSchema>;
@@ -113,5 +112,4 @@ export interface ProductInputErrors {
   tags: string;
   statut: string;
   imageUrl: string;
-  inventaire: string;
 }

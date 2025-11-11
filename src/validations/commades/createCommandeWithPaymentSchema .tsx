@@ -5,7 +5,7 @@ import { z } from "zod";
 export const createCommandeWithPaymentSchema = z.object({
   produitId: z.string().cuid("ID produit invalide"),
   quantite: z
-    .string()
+    .number()
     .min(1, "La quantité est requise")
     .refine((val) => !isNaN(Number(val)) && Number(val) > 0, {
       message: "La quantité doit être un nombre positif",
@@ -18,7 +18,7 @@ export const createCommandeWithPaymentSchema = z.object({
     }),
   adresseLivraison: z
     .string()
-    .min(10, "L'adresse doit contenir au moins 10 caractères")
+    .min(3, "L'adresse doit contenir au moins 10 caractères")
     .max(500, "L'adresse ne peut pas dépasser 500 caractères"),
   methodePaiement: z.enum(["carte", "especes", "virement", "mobile"], {
     errorMap: () => ({ message: "Méthode de paiement invalide" }),
@@ -33,14 +33,14 @@ export const createCommandeWithPaymentSchema = z.object({
 export const createCommandeSchema = z.object({
   produitId: z.string().cuid("ID produit invalide"),
   quantite: z
-    .string()
+    .number()
     .min(1, "La quantité est requise")
     .refine((val) => !isNaN(Number(val)) && Number(val) > 0, {
       message: "La quantité doit être un nombre positif",
     }),
   adresseLivraison: z
     .string()
-    .min(10, "L'adresse doit contenir au moins 10 caractères")
+    .min(3, "L'adresse doit contenir au moins 10 caractères")
     .max(500, "L'adresse ne peut pas dépasser 500 caractères"),
   notes: z
     .string()
@@ -82,7 +82,7 @@ export const updateDeliveryAddressSchema = z.object({
   orderId: z.string().cuid("ID commande invalide"),
   adresseLivraison: z
     .string()
-    .min(10, "L'adresse doit contenir au moins 10 caractères")
+    .min(3, "L'adresse doit contenir au moins 10 caractères")
     .max(500, "L'adresse ne peut pas dépasser 500 caractères"),
 });
 

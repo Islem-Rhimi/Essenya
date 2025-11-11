@@ -1,3 +1,5 @@
+"use client";
+
 import {
   Table,
   TableBody,
@@ -7,26 +9,20 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Card } from "@/components/ui/card";
-import { ProductTableRow } from "./ProductTableRow";
 import { TemplatePagination } from "~/common/components/pagination/components/template-pagination";
 import { useSession } from "next-auth/react";
 import { usePagination } from "~/common/components/pagination/hooks/use-pagination";
 import { api } from "~/utils/api";
-import React from "react";
+import SellerOrderTableRow from "./SellerOrderTableRow";
 
-interface ProductTableProps {
-  searchValue: string;
-}
-
-export const ProductTable: React.FC<ProductTableProps> = ({ searchValue }) => {
+export default function SellerOrderTable() {
   const { status } = useSession();
-  const { paginationStates, paginationSetStates } = usePagination();
+  const { paginationStates } = usePagination();
 
-  const { data, isLoading, error } = api.produits.getMyProducts.useQuery(
+  const { data, isLoading, error } = api.commande.vendeurOrders.useQuery(
     {
       page: paginationStates.currentPage,
       pageSize: paginationStates.itemsPerPage,
-      search: searchValue,
     },
     {
       enabled: status === "authenticated",
@@ -34,21 +30,14 @@ export const ProductTable: React.FC<ProductTableProps> = ({ searchValue }) => {
     },
   );
 
-  // Reset to page 1 on search
-  React.useEffect(() => {
-    if (searchValue) {
-      paginationSetStates.setCurrentPage(1);
-    }
-  }, [searchValue, paginationSetStates]);
-
   if (status === "loading") return <div>Loading session…</div>;
   if (status === "unauthenticated")
-    return <div>Please sign in to view your products</div>;
+    return <div>Please sign in to view your orders</div>;
 
   if (isLoading)
     return (
       <Card className="p-8 text-center">
-        <p className="text-[var(--accent-gold)]">Loading products…</p>
+        <p className="text-[var(--accent-gold)]">Loading received orders…</p>
       </Card>
     );
 
@@ -59,7 +48,7 @@ export const ProductTable: React.FC<ProductTableProps> = ({ searchValue }) => {
       </Card>
     );
 
-  const products = data?.data ?? [];
+  const orders = data?.data ?? [];
   const meta = data?.meta;
 
   return (
@@ -68,12 +57,13 @@ export const ProductTable: React.FC<ProductTableProps> = ({ searchValue }) => {
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead className="px-4 py-3 pl-8">Product</TableHead>
-              <TableHead className="px-4 py-3">Price</TableHead>
-              <TableHead className="px-4 py-3">Location</TableHead>
-              <TableHead className="px-4 py-3">quantite</TableHead>
-              <TableHead className="px-4 py-3">Tags</TableHead>
-              <TableHead className="px-4 py-3">Status</TableHead>
+              <TableHead className="px-4 py-3">Produit</TableHead>
+              <TableHead className="px-4 py-3">Client</TableHead>
+              <TableHead className="px-4 py-3">Date</TableHead>
+              <TableHead className="px-4 py-3">Quantité</TableHead>
+              <TableHead className="px-4 py-3">Montant</TableHead>
+              <TableHead className="px-4 py-3">Statut</TableHead>
+              <TableHead className="px-4 py-3">Notes</TableHead>
               <TableHead className="flex justify-center px-4 py-3">
                 Actions
               </TableHead>
@@ -81,26 +71,27 @@ export const ProductTable: React.FC<ProductTableProps> = ({ searchValue }) => {
           </TableHeader>
 
           <TableBody>
-            {products.length === 0 ? (
+            {orders.length === 0 ? (
               <TableRow>
                 <TableCell
                   colSpan={7}
                   className="py-12 text-center text-gray-500"
                 >
-                  No products found
+                  Aucun commande reçue
                 </TableCell>
               </TableRow>
             ) : (
-              products.map((product) => (
-                <ProductTableRow key={product.id} product={product} />
+              orders.map((order) => (
+                <SellerOrderTableRow key={order.id} order={order} />
               ))
             )}
           </TableBody>
         </Table>
       </Card>
+
       <Card className="overflow-auto rounded-xl border border-[rgba(212,175,55,0.3)] p-0 shadow backdrop-blur">
         {meta && <TemplatePagination meta={meta} />}
       </Card>
     </div>
   );
-};
+}

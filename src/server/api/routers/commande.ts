@@ -9,8 +9,59 @@ import {
   getMyOrdersSchema,
   getOrderByIdSchema,
 } from "~/validations/commades/createCommandeWithPaymentSchema ";
+import type { Prisma } from "@prisma/client";
 
 export const commandeRouter = createTRPCRouter({
+  vendeurOrders: protectedProcedure
+    .input(getMyOrdersSchema) // ✅ reuse same pagination & filter schema
+    .query(async ({ ctx, input }) => {
+      const { page, pageSize, statut } = input;
+      const { skip, take } = paginate(page, pageSize);
+
+      const where: Prisma.CommandeWhereInput = {
+        produit: {
+          vendeur: { userId: { equals: ctx.session.user.id } },
+        },
+        ...(statut && statut !== "TOUS" && { statut }),
+      };
+
+      const [total, orders] = await Promise.all([
+        ctx.db.commande.count({ where }),
+        ctx.db.commande.findMany({
+          where,
+          skip,
+          take,
+          include: { produit: true, paiement: true, user: true }, // ✅ include buyer info
+          orderBy: { date: "desc" },
+        }),
+      ]);
+
+      return {
+        data: orders,
+        meta: buildPaginationMeta(total, page, pageSize),
+      };
+    }),
+
+  updateStatut: protectedProcedure
+    .input(
+      z.object({
+        orderId: z.string(),
+        statut: z.enum([
+          "EN_ATTENTE",
+          "CONFIRMEE",
+          "EN_COURS",
+          "LIVREE",
+          "ANNULEE",
+        ]),
+      }),
+    )
+    .mutation(async ({ ctx, input }) => {
+      return ctx.db.commande.update({
+        where: { id: input.orderId },
+        data: { statut: input.statut },
+      });
+    }),
+
   myOrders: protectedProcedure
     .input(getMyOrdersSchema)
     .query(async ({ ctx, input }) => {
@@ -40,7 +91,7 @@ export const commandeRouter = createTRPCRouter({
     .input(
       z.object({
         produitId: z.string(),
-        quantite: z.string(),
+        quantite: z.number(),
         adresseLivraison: z.string(),
         notes: z.string().optional(),
       }),
@@ -75,11 +126,10 @@ export const commandeRouter = createTRPCRouter({
         });
       }
 
-      const quantiteNum = parseInt(quantite);
-      if (product.inventaire < quantiteNum) {
+      if (product.quantite < quantite) {
         throw new TRPCError({
           code: "BAD_REQUEST",
-          message: `Stock insuffisant. Disponible: ${product.inventaire}`,
+          message: `Stock insuffisant. Disponible: ${product.quantite}`,
         });
       }
 
@@ -109,8 +159,8 @@ export const commandeRouter = createTRPCRouter({
         await tx.produits.update({
           where: { id: produitId },
           data: {
-            inventaire: {
-              decrement: quantiteNum,
+            quantite: {
+              decrement: quantite,
             },
           },
         });
@@ -187,13 +237,11 @@ export const commandeRouter = createTRPCRouter({
           where: { id: input.orderId },
           data: { statut: "ANNULEE" },
         });
-
-        // Restore product inventory
         await tx.produits.update({
           where: { id: order.produitId },
           data: {
-            inventaire: {
-              increment: parseInt(order.quantite),
+            quantite: {
+              increment: order.quantite,
             },
           },
         });
