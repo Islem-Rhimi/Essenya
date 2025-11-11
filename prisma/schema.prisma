@@ -164,28 +164,33 @@ model Produits {
 
 // Commande model
 model Commande {
-    id        String    @id @default(cuid())
-    date      DateTime  @default(now())
-    statut    String
-    userId    String
-    produitId String
-    user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
-    produit   Produits  @relation(fields: [produitId], references: [id], onDelete: Cascade)
-    paiement  Paiement?
+    id               String    @id @default(cuid())
+    date             DateTime  @default(now())
+    quantite         String
+    adresseLivraison String
+    notes            String?
+    statut           String
+    userId           String
+    produitId        String
+    user             User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+    produit          Produits  @relation(fields: [produitId], references: [id], onDelete: Cascade)
+    paiement         Paiement?
+    createdAt        DateTime  @default(now())
+    updatedAt        DateTime  @updatedAt
 
-    createdAt DateTime @default(now())
-    updatedAt DateTime @updatedAt
+    @@index([userId])
+    @@index([produitId])
+    @@index([statut])
 }
 
 model Demmande {
-    id        String    @id @default(cuid())
-    date      DateTime  @default(now())
+    id        String   @id @default(cuid())
+    date      DateTime @default(now())
     statut    String
     userId    String
     serviceId String
-    user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
-    service   Services  @relation(fields: [serviceId], references: [id], onDelete: Cascade)
-    paiement  Paiement? @relation(fields: [paiementId], references: [id])
+    user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+    service   Services @relation(fields: [serviceId], references: [id], onDelete: Cascade)
 
     createdAt  DateTime @default(now())
     updatedAt  DateTime @updatedAt
@@ -199,10 +204,8 @@ model Paiement {
     montant    String
     commandeId String   @unique
     commande   Commande @relation(fields: [commandeId], references: [id], onDelete: Cascade)
-
-    createdAt DateTime   @default(now())
-    updatedAt DateTime   @updatedAt
-    demmandes Demmande[]
+    createdAt  DateTime @default(now())
+    updatedAt  DateTime @updatedAt
 }
 
 // Evenement model
@@ -224,7 +227,7 @@ model Evenement {
 model Reservation {
     id          String    @id @default(cuid())
     date        DateTime  @default(now())
-    statut      String
+    statut      String    @default("EN_ATTENTE")
     userId      String
     evenementId String
     user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
