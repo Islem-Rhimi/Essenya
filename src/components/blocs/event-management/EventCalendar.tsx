@@ -25,11 +25,13 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import Image from "next/image";
 import { Badge } from "~/components/ui/badge";
 import { Label } from "~/components/ui/label";
+import { useRouter } from "next/router";
 
 // Form type matches schema exactly
 // type EventFormType = eventInputSchemaType; // Not needed anymore
 
 export default function EventCalendar() {
+  const router = useRouter();
   const [uploadedUrl, setUploadedUrl] = useState<string>("");
   const [isUploading, setIsUploading] = useState(false);
   const [currentDate, setCurrentDate] = useState(new Date());
@@ -287,8 +289,8 @@ export default function EventCalendar() {
       date: formData.date,
       time: formData.time,
       color: formData.color || "#3b82f6",
-      image: formData.image || undefined,
-      description: formData.description || undefined,
+      image: formData.image ?? undefined,
+      description: formData.description ?? undefined,
     };
 
     if (selectedEventId) {
@@ -360,7 +362,7 @@ export default function EventCalendar() {
           {days.map((date, index) => {
             const dayEvents = getEventsForDate(date);
             const isCurrentDay = isToday(date);
-            const dateKey = date?.toISOString() || `empty-${index}`;
+            const dateKey = date?.toISOString() ?? `empty-${index}`;
             const isHovered = hoveredDate === dateKey;
 
             return (
@@ -417,7 +419,7 @@ export default function EventCalendar() {
                     </div>
 
                     {/* Hover popup to show all events */}
-                    {isHovered && dayEvents.length > 3 && (
+                    {isHovered && dayEvents.length > 0 && (
                       <div className="absolute top-0 left-0 z-50 w-64 rounded-lg border border-gray-300 bg-white p-3 shadow-xl">
                         <div className="mb-2 font-semibold text-gray-700">
                           {date.toLocaleDateString("fr-FR", {
@@ -462,8 +464,8 @@ export default function EventCalendar() {
 
       {/* Event Dialog */}
       {isDialogOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30 p-4">
-          <div className="w-full max-w-md rounded-lg bg-white shadow-xl">
+        <div className="fixed inset-0 z-50 flex items-center justify-center overflow-y-auto bg-black/30 p-4">
+          <div className="max-h-[90vh] w-full max-w-3xl overflow-y-auto rounded-lg bg-white shadow-xl">
             <div className="flex items-center justify-between border-b p-6">
               <h3 className="text-xl font-semibold">
                 {selectedEventId ? "Modifier l'événement" : "Nouvel événement"}
@@ -480,7 +482,7 @@ export default function EventCalendar() {
             <div className="space-y-4 p-6">
               {/* IMAGE UPLOAD */}
               <div className="space-y-3">
-                <Label>Photo de l'événement</Label>
+                <Label>Photo de l&apos;événement</Label>
                 <div
                   className="hover:border-primary/50 cursor-pointer rounded-xl border-2 border-dashed p-10 text-center transition-all"
                   onClick={(e) => {
@@ -557,7 +559,6 @@ export default function EventCalendar() {
                   <p className="text-sm text-red-500">{errors.image.message}</p>
                 )}
               </div>
-
               {/* TITLE */}
               <div>
                 <label className="mb-1 block text-sm font-medium text-gray-700">
@@ -692,27 +693,25 @@ export default function EventCalendar() {
                   </Button>
                 )}
                 <div className="ml-auto flex gap-2">
-                  <Button
-                    type="button"
-                    onClick={closeDialog}
-                    className="rounded-lg border border-gray-300 px-4 py-2 hover:bg-gray-50"
-                  >
+                  <Button type="button" variant="link" onClick={() => router.push(`/event-management/reservation/${selectedEventId}`)}>
+                    vérifier les réservations d&apos;événements
+                  </Button>
+                  <Button type="button" variant="outline" onClick={closeDialog}>
                     Annuler
                   </Button>
-                  <button
+                  <Button
                     type="button"
                     onClick={handleSubmit(onSubmit)}
                     disabled={
                       isSubmitting || create.isPending || update.isPending
                     }
-                    className="rounded-lg bg-green-600 px-4 py-2 text-white hover:bg-green-700 disabled:opacity-50"
                   >
                     {isSubmitting || create.isPending || update.isPending
                       ? "En cours..."
                       : selectedEventId
                         ? "Sauvegarder"
                         : "Créer"}
-                  </button>
+                  </Button>
                 </div>
               </div>
             </div>

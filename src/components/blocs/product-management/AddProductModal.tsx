@@ -31,9 +31,9 @@ import {
   productInputSchema,
   units,
   type Categorie,
-  type productInputSchemaType,
+  type ProductInputSchemaType,
   type Statut,
-  type Unit,
+  type Unite,
 } from "~/validations/product/productInputSchema";
 import Image from "next/image";
 
@@ -67,24 +67,24 @@ export function AddProductModal({ open, onOpenChange }: AddProductModalProps) {
     setValue,
     reset,
     formState: { errors, isSubmitting },
-  } = useForm<productInputSchemaType>({
+  } = useForm<ProductInputSchemaType>({
     resolver: zodResolver(productInputSchema),
     defaultValues: {
       nom: "",
       description: "",
       prix: "",
       quantite: "10",
-      unite: "per piece",
+      unite: "par livre",
       localisation: "",
-      categorie: "vegetables",
+      categorie: "Légumes",
       tags: [],
-      statut: "in-stock",
+      statut: "en-stock",
       imageUrl: "",
       inventaire: 10,
     },
   });
 
-  const tags = watch("tags") || [];
+  const tags = watch("tags") ?? [];
   const currentValues = watch();
 
   const onDrop = async (acceptedFiles: File[]) => {
@@ -127,7 +127,7 @@ export function AddProductModal({ open, onOpenChange }: AddProductModalProps) {
     }
   };
 
-  const onSubmit: SubmitHandler<productInputSchemaType> = async (data) => {
+  const onSubmit: SubmitHandler<ProductInputSchemaType> = async (data) => {
     console.log("📝 Form submitted with data:", data);
     console.log("📝 Form errors:", errors);
     console.log("📝 Current form values:", currentValues);
@@ -276,7 +276,7 @@ export function AddProductModal({ open, onOpenChange }: AddProductModalProps) {
                     shouldValidate: true,
                   });
                 }}
-                defaultValue="vegetables"
+                defaultValue="Légumes"
               >
                 <SelectTrigger>
                   <SelectValue placeholder="Choisir..." />
@@ -333,9 +333,9 @@ export function AddProductModal({ open, onOpenChange }: AddProductModalProps) {
               <Select
                 onValueChange={(v) => {
                   console.log("Unit selected:", v);
-                  setValue("unite", v as Unit, { shouldValidate: true });
+                  setValue("unite", v as Unite, { shouldValidate: true });
                 }}
-                defaultValue="per piece"
+                defaultValue="par livre"
               >
                 <SelectTrigger>
                   <SelectValue />
@@ -389,15 +389,15 @@ export function AddProductModal({ open, onOpenChange }: AddProductModalProps) {
                 console.log("Status selected:", v);
                 setValue("statut", v as Statut, { shouldValidate: true });
               }}
-              defaultValue="in-stock"
+              defaultValue="en-stock"
             >
               <SelectTrigger>
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="in-stock">En stock</SelectItem>
-                <SelectItem value="limited">Stock limité</SelectItem>
-                <SelectItem value="out-of-stock">Rupture</SelectItem>
+                <SelectItem value="en-stock">En stock</SelectItem>
+                <SelectItem value="limité">Stock limité</SelectItem>
+                <SelectItem value="rupture">Rupture</SelectItem>
               </SelectContent>
             </Select>
             {errors.statut && (

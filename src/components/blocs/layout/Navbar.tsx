@@ -19,15 +19,17 @@ export default function Navbar() {
   const pathname = usePathname() ?? "";
 
   const getTitle = () => {
-    if (pathname.startsWith("/dashboard")) return "Dashboard";
-    if (pathname.startsWith("/Market")) return "market";
-    if (pathname.startsWith("/farm-service")) return "Services";
-    if (pathname.startsWith("/product-management")) return "My Products";
-    if (pathname.startsWith("/service-management")) return "My Services";
-    if (pathname.startsWith("/event-management")) return "My Events";
-    if (pathname.startsWith("/tourism")) return "Tourism";
-    if (pathname.startsWith("/profile")) return "Profile";
-    if (pathname.startsWith("/market")) return "Market";
+    if (pathname.startsWith("/dashboard")) return "Tableau de bord";
+    if (pathname.startsWith("/market")) return "Marché";
+    if (pathname.startsWith("/farm-service")) return "Services agricoles";
+    if (pathname.startsWith("/product-management")) return "Mes produits";
+    if (pathname.startsWith("/service-management")) return "Mes services";
+    if (pathname.startsWith("/event-management")) return "Mes événements";
+    if (pathname.startsWith("/tourism")) return "Tourisme";
+    if (pathname.startsWith("/event")) return "Événements";
+    if (pathname.startsWith("/my-reservations")) return "Mes réservations";
+    if (pathname.startsWith("/my-orders")) return "Mes commandes";
+    if (pathname.startsWith("/profile")) return "Profil";
 
     return "Dashboard";
   };
@@ -54,7 +56,7 @@ export default function Navbar() {
                 <AvatarFallback>
                   {session?.user?.name?.split(" ")[0]?.charAt(0)}
                   {session?.user?.name?.split(" ")[1]?.charAt(0)}
-                  </AvatarFallback>
+                </AvatarFallback>
               </Avatar>
             </Button>
           </DropdownMenuTrigger>

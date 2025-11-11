@@ -12,10 +12,15 @@ import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { api } from "~/utils/api";
 import { Card } from "@/components/ui/card";
+import Link from "next/link";
+import { useSession } from "next-auth/react";
 
 export default function Carousel() {
   const [current, setCurrent] = useState<number>(0);
   const [paused, setPaused] = useState(false);
+  const { status } = useSession();
+
+  const href = status === "authenticated" ? "/event" : "/events";
 
   const { data, isLoading, error } = api.evenement.getAllEvents.useQuery(
     undefined,
@@ -169,10 +174,11 @@ export default function Carousel() {
                   </div>
                 )}
               </div>
-
-              <Button className="mt-4" size="sm">
-                En Savoir Plus
-              </Button>
+              <Link href={href}>
+                <Button className="mt-4" size="sm">
+                  En Savoir Plus
+                </Button>
+              </Link>
             </div>
           </div>
         </div>

@@ -1,90 +1,104 @@
 import { z } from "zod";
 
+/* 🥕 Catégories */
 export const categories = [
-  { value: "vegetables", label: "vegetables" },
-  { value: "fruits", label: "fruits" },
-  { value: "grains", label: "grains" },
-  { value: "dairy", label: "dairy" },
-  { value: "meat", label: "meat" },
-  { value: "herbs", label: "herbs" },
+  { value: "Légumes", label: "Légumes" },
+  { value: "Fruits", label: "Fruits" },
+  { value: "Céréales", label: "Céréales" },
+  { value: "Produits laitiers", label: "Produits laitiers" },
+  { value: "Viande", label: "Viande" },
+  { value: "Herbes", label: "Herbes" },
 ];
 
 const CATEGORIES = [
-  "vegetables",
-  "fruits",
-  "grains",
-  "dairy",
-  "meat",
-  "herbs",
+  "Légumes",
+  "Fruits",
+  "Céréales",
+  "Produits laitiers",
+  "Viande",
+  "Herbes",
 ] as const;
 export const categorieEnum = z.enum(CATEGORIES);
 export type Categorie = (typeof CATEGORIES)[number];
 
+/* ⚖️ Unités */
 export const units = [
-  { value: "per lb", label: "per lb" },
-  { value: "per kg", label: "per kg" },
-  { value: "per dozen", label: "per dozen" },
-  { value: "per piece", label: "per piece" },
-  { value: "per bunch", label: "per bunch" },
-  { value: "per bag", label: "per bag" },
-  { value: "per box", label: "per box" },
+  { value: "par livre", label: "par livre" },
+  { value: "par kilogramme", label: "par kilogramme" },
+  { value: "par douzaine", label: "par douzaine" },
+  { value: "par pièce", label: "par pièce" },
+  { value: "par botte", label: "par botte" },
+  { value: "par sac", label: "par sac" },
+  { value: "par boîte", label: "par boîte" },
 ];
 const UNITS = [
-  "per lb",
-  "per kg",
-  "per dozen",
-  "per piece",
-  "per bunch",
-  "per bag",
-  "per box",
+  "par livre",
+  "par kilogramme",
+  "par douzaine",
+  "par pièce",
+  "par botte",
+  "par sac",
+  "par boîte",
 ] as const;
 export const uniteEnum = z.enum(UNITS);
-export type Unit = (typeof UNITS)[number];
+export type Unite = (typeof UNITS)[number];
+
+/* 🏷️ Étiquettes prédéfinies */
 export const predefinedTags = [
   "Bio",
   "Local",
-  "Artisanal",
-  "Fait main",
-  "Édition limitée",
-  "Mariage",
-  "Luxe",
+  "Saisonnière",
+  "Récolte fraîche",
+  "Sans pesticides",
+  "Sans OGM",
+  "Élevage en plein air",
+  "Alimentation naturelle",
+  "Agriculture durable",
   "Éco-responsable",
-  "Vintage",
+  "Fait à la ferme",
+  "Production artisanale",
+  "Circuit court",
+  "Commerce équitable",
+  "Traditionnel",
+  "Fermier",
+  "Récolte manuelle",
+  "Produit de montagne",
+  "Produit de la mer",
+  "Nourri à l’herbe",
 ];
-const STATUTS = ["in-stock", "out-of-stock", "limited"] as const;
+
+/* 📦 Statuts du produit */
+const STATUTS = ["en-stock", "rupture", "limité"] as const;
 export const statutEnum = z.enum(STATUTS);
 export type Statut = (typeof STATUTS)[number];
 
+/* 🧾 Validation du formulaire produit */
 export const productInputSchema = z.object({
-  nom: z.string().min(1, "Product name is required"),
-  description: z.string().min(1, "Description is required"),
-  prix: z.string(),
-  quantite: z.string().min(1, "quantite is required"),
+  nom: z.string().min(1, "Le nom du produit est obligatoire."),
+  description: z.string().min(1, "La description est obligatoire."),
+  prix: z.string().min(1, "Le prix est obligatoire."),
+  quantite: z.string().min(1, "La quantité est obligatoire."),
   unite: uniteEnum,
-  localisation: z.string().min(1, "Location is required"),
+  localisation: z.string().min(1, "La localisation est obligatoire."),
   categorie: categorieEnum,
-  tags: z.array(z.string()),
+  tags: z.array(z.string()).optional(),
   statut: statutEnum,
   imageUrl: z
     .string()
-    .min(1, "Image is required")
+    .min(1, "L’image est obligatoire.")
     .refine(
-      (val) => {
-        // Accept full URLs or relative paths starting with /
-        return (
-          val.startsWith("http://") ||
-          val.startsWith("https://") ||
-          val.startsWith("/")
-        );
-      },
-      { message: "Must be a valid URL or path" },
+      (val) =>
+        val.startsWith("http://") ||
+        val.startsWith("https://") ||
+        val.startsWith("/"),
+      { message: "L’URL ou le chemin de l’image n’est pas valide." },
     )
     .optional()
     .nullable(),
-  inventaire: z.number().int().min(0, "Inventory must be non-negative"),
+  inventaire: z.number().int().min(0, "Le stock doit être un nombre positif."),
 });
 
-export type productInputSchemaType = z.infer<typeof productInputSchema>;
+export type ProductInputSchemaType = z.infer<typeof productInputSchema>;
 
 export interface ProductInputErrors {
   nom: string;

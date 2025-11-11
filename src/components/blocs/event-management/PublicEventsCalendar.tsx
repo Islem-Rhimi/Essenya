@@ -5,6 +5,7 @@ import { ChevronLeft, ChevronRight, MapPin, Clock, User } from "lucide-react";
 import { api } from "~/utils/api";
 import Image from "next/image";
 import { Button } from "~/components/ui/button";
+import { useSession } from "next-auth/react";
 
 type Event = {
   id: string;
@@ -25,10 +26,26 @@ export default function PublicEventsCalendar() {
   const [currentDate, setCurrentDate] = useState(new Date());
   const [selectedEvent, setSelectedEvent] = useState<Event | null>(null);
   const [hoveredDate, setHoveredDate] = useState<string | null>(null);
+  const utils = api.useUtils();
+  const { status } = useSession();
 
   // Fetch all public events
   const { data } = api.evenement.getAllEvents.useQuery(undefined, {
     refetchOnWindowFocus: false,
+  });
+
+  const Bookings = api.reservation.create.useMutation({
+    onSuccess: async () => {
+      await utils.reservation.myBookings.invalidate();
+      setSelectedEvent(null);
+      alert(
+        "Succès ! Votre réservation a été envoyée. Veuillez patienter la confirmation.",
+      );
+    },
+    onError: (error) => {
+      console.error("❌ Create mutation error:", error);
+      alert(`Erreur lors de la création: ${error.message}`);
+    },
   });
 
   const events: Event[] = (data?.data ?? []) as Event[];
@@ -124,12 +141,12 @@ export default function PublicEventsCalendar() {
       {/* Header */}
       <div className="mb-6 flex items-center justify-between">
         <div className="flex items-center gap-4">
-          <Button
+          <button
             onClick={goToToday}
             className="rounded-lg border border-gray-300 px-4 py-2 hover:bg-gray-50"
           >
             Aujourd&apos;hui
-          </Button>
+          </button>
           <div className="flex items-center gap-2">
             <Button
               onClick={() => navigateMonth(-1)}
@@ -169,7 +186,7 @@ export default function PublicEventsCalendar() {
           {days.map((date, index) => {
             const dayEvents = getEventsForDate(date);
             const isCurrentDay = isToday(date);
-            const dateKey = date?.toISOString() || `empty-${index}`;
+            const dateKey = date?.toISOString() ?? `empty-${index}`;
             const isHovered = hoveredDate === dateKey;
 
             return (
@@ -222,7 +239,7 @@ export default function PublicEventsCalendar() {
                     </div>
 
                     {/* Hover popup to show all events */}
-                    {isHovered && dayEvents.length > 3 && (
+                    {isHovered && dayEvents.length > 0 && (
                       <div className="absolute top-0 left-0 z-50 w-64 rounded-lg border border-gray-300 bg-white p-3 shadow-xl">
                         <div className="mb-2 font-semibold text-gray-700">
                           {date.toLocaleDateString("fr-FR", {
@@ -290,12 +307,12 @@ export default function PublicEventsCalendar() {
                 <h2 className="text-2xl font-bold text-gray-900">
                   {selectedEvent.title}
                 </h2>
-                <Button
+                <button
                   onClick={() => setSelectedEvent(null)}
                   className="rounded-full p-2 hover:bg-gray-100"
                 >
                   ✕
-                </Button>
+                </button>
               </div>
 
               <div className="space-y-3">
@@ -322,7 +339,7 @@ export default function PublicEventsCalendar() {
                 <div className="flex items-center gap-2 text-gray-600">
                   <User className="h-5 w-5" />
                   <span>
-                    Organisé par {selectedEvent.vendeur.user.name || "Anonyme"}
+                    Organisé par {selectedEvent.vendeur.user.name ?? "Anonyme"}
                   </span>
                 </div>
 
@@ -340,17 +357,18 @@ export default function PublicEventsCalendar() {
 
                 {/* Action Button */}
                 <div className="mt-6 flex gap-3">
+                  {status === "authenticated" && (
+                    <Button
+                      onClick={() =>
+                        Bookings.mutate({ evenementId: selectedEvent.id })
+                      }
+                    >
+                      Réserver
+                    </Button>
+                  )}
                   <Button
-                    className="flex-1 rounded-lg bg-blue-600 px-6 py-3 font-medium text-white hover:bg-blue-700"
-                    onClick={() => {
-                      // Handle reservation
-                      alert("Fonction de réservation à venir !");
-                    }}
-                  >
-                    Réserver
-                  </Button>
-                  <Button
-                    className="rounded-lg border border-gray-300 px-6 py-3 font-medium text-gray-700 hover:bg-gray-50"
+                    type="button"
+                    variant="outline"
                     onClick={() => setSelectedEvent(null)}
                   >
                     Fermer

@@ -34,10 +34,10 @@ import {
   type Categorie,
   type productUpdateSchemaType,
   type Statut,
-  type Unit,
 } from "~/validations/product/productUpdateSchema";
 import type { Produits } from "@prisma/client";
 import { toast } from "sonner";
+import type { Unite } from "~/validations/product/productInputSchema";
 
 interface EditProductModalProps {
   open: boolean;
@@ -71,7 +71,7 @@ export function EditProductModal({
       description: product.description,
       prix: product.prix,
       quantite: product.quantite,
-      unite: product.unite as Unit,
+      unite: product.unite as Unite,
       localisation: product.localisation,
       categorie: product.categorie as Categorie,
       tags: product.tags,
@@ -102,7 +102,7 @@ export function EditProductModal({
       description: product.description,
       prix: product.prix,
       quantite: product.quantite,
-      unite: product.unite as Unit,
+      unite: product.unite as Unite,
       localisation: product.localisation,
       categorie: product.categorie as Categorie,
       tags: product.tags,
@@ -293,7 +293,7 @@ export function EditProductModal({
             <div className="space-y-2">
               <Label>Unité *</Label>
               <Select
-                onValueChange={(v) => setValue("unite", v as Unit)}
+                onValueChange={(v) => setValue("unite", v as Unite)}
                 value={watch("unite")}
               >
                 <SelectTrigger>
@@ -334,9 +334,9 @@ export function EditProductModal({
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="in-stock">En stock</SelectItem>
-                <SelectItem value="limited">Stock limité</SelectItem>
-                <SelectItem value="out-of-stock">Rupture</SelectItem>
+                <SelectItem value="en-stock">En stock</SelectItem>
+                <SelectItem value="limité">Stock limité</SelectItem>
+                <SelectItem value="rupture">Rupture</SelectItem>
               </SelectContent>
             </Select>
           </div>

@@ -14,6 +14,9 @@ import {
   X,
   HandPlatter,
   CalendarCheck,
+  BookCheck,
+  PackageOpen,
+  Truck,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import clsx from "clsx";
@@ -29,72 +32,81 @@ type Role = "ADMIN" | "VENDEUR" | "CLIENT" | null;
 
 const MENU_BY_ROLE: Record<NonNullable<Role>, NavItem[]> = {
   ADMIN: [
-    { name: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
+    { name: "Tableau de bord", href: "/dashboard", icon: LayoutDashboard },
     { name: "Services", href: "/farm-service", icon: HandPlatter },
-    { name: "Tourism", href: "/tourism", icon: Plane },
+    { name: "Tourisme", href: "/tourism", icon: Plane },
     {
-      name: "Event",
+      name: "Événements",
       href: "/event",
       icon: CalendarDays,
     },
     {
-      name: "Product Management",
+      name: "Gestion des produits",
       href: "/product-management",
       icon: PackageCheck,
     },
     {
-      name: "Event Management",
+      name: "Gestion des événements",
       href: "/event-management",
       icon: CalendarCheck,
     },
     {
-      name: "Service Management",
+      name: "Gestion des services",
       href: "/service-management",
       icon: Wrench,
     },
-    { name: "Profile", href: "/profile", icon: User },
+    { name: "Profil", href: "/profile", icon: User },
   ],
+
   VENDEUR: [
-    { name: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
+    { name: "Tableau de bord", href: "/dashboard", icon: LayoutDashboard },
     { name: "Services", href: "/farm-service", icon: HandPlatter },
-    { name: "Tourism", href: "/tourism", icon: Plane },
+    { name: "Tourisme", href: "/tourism", icon: Plane },
     {
-      name: "Event",
+      name: "Événements",
       href: "/event",
       icon: CalendarDays,
     },
     {
-      name: "Product Management",
+      name: "Gestion des produits",
       href: "/product-management",
       icon: PackageCheck,
     },
     {
-      name: "Event Management",
+      name: "Gestion des événements",
       href: "/event-management",
       icon: CalendarCheck,
     },
     {
-      name: "Service Management",
+      name: "Gestion des services",
       href: "/service-management",
       icon: Wrench,
     },
-    { name: "Profile", href: "/profile", icon: User },
-  ],
-  CLIENT: [
-    { name: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
-    { name: "Services", href: "/farm-service", icon: HandPlatter },
-    { name: "Tourism", href: "/tourism", icon: Plane },
     {
-      name: "Event",
+      name: "Mes commandes reçues",
+      href: "/my-recived-orders",
+      icon: Truck,
+    },
+    { name: "Profil", href: "/profile", icon: User },
+  ],
+
+  CLIENT: [
+    { name: "Tableau de bord", href: "/dashboard", icon: LayoutDashboard },
+    { name: "Services", href: "/farm-service", icon: HandPlatter },
+    { name: "Tourisme", href: "/tourism", icon: Plane },
+    {
+      name: "Événements",
       href: "/event",
       icon: CalendarDays,
     },
     {
-      name: "Service Management",
+      name: "Gestion des services",
       href: "/service-management",
       icon: Wrench,
     },
-    { name: "Profile", href: "/profile", icon: User },
+    { name: "Mes réservations", href: "/my-reservations", icon: BookCheck },
+    { name: "Mes commandes", href: "/my-orders", icon: PackageOpen },
+    { name: "Profil", href: "/profile", icon: User },
   ],
 };
 
