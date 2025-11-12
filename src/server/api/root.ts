@@ -10,6 +10,7 @@ import { paiementRouter } from "./routers/paiement";
 import { evenementRouter } from "./routers/evenement";
 import { reservationRouter } from "./routers/reservation";
 import { sessionRouter } from "./routers/session";
+import { profileRouter } from "./routers/profile";
 
 /**
  * This is the primary router for your server.
@@ -28,6 +29,7 @@ export const appRouter = createTRPCRouter({
   evenement: evenementRouter,
   reservation: reservationRouter,
   session: sessionRouter,
+  profile: profileRouter,
 });
 
 // export type definition of API
