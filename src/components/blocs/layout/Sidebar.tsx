@@ -61,7 +61,6 @@ const MENU_BY_ROLE: Record<NonNullable<Role>, NavItem[]> = {
   VENDEUR: [
     { name: "Tableau de bord", href: "/dashboard", icon: LayoutDashboard },
     { name: "Services", href: "/farm-service", icon: HandPlatter },
-    { name: "Tourisme", href: "/tourism", icon: Plane },
     {
       name: "Événements",
       href: "/event",
@@ -93,7 +92,6 @@ const MENU_BY_ROLE: Record<NonNullable<Role>, NavItem[]> = {
   CLIENT: [
     { name: "Tableau de bord", href: "/dashboard", icon: LayoutDashboard },
     { name: "Services", href: "/farm-service", icon: HandPlatter },
-    { name: "Tourisme", href: "/tourism", icon: Plane },
     {
       name: "Événements",
       href: "/event",
