@@ -5,7 +5,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Store, ShoppingBag, ArrowRight } from "lucide-react";
+import { Store, ArrowRight, ShoppingBag } from "lucide-react";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import AuthGuard from "~/layouts/auth-guard";
@@ -47,7 +47,7 @@ export default function SessionTypeSelection() {
                   <Store className="text-primary h-10 w-10" />
                 </div>
                 <CardTitle className="text-2xl font-bold">
-                  Je suis Vendeur 
+                  Je suis Vendeur
                 </CardTitle>
                 <CardDescription className="mt-3 text-base">
                   Gérez votre espace, ajoutez des produits et organisez des
@@ -80,7 +80,7 @@ export default function SessionTypeSelection() {
               </CardHeader>
               <CardContent className="border-t pt-6">
                 <div className="text-primary flex items-center justify-center gap-3 font-medium">
-                  <span>Explorer </span> 
+                  <span>Explorer </span>
                   <ArrowRight className="h-5 w-5 transition-transform group-hover:translate-x-2" />
                 </div>
               </CardContent>
